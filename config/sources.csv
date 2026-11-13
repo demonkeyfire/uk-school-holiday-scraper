@@ -1,0 +1,210 @@
+SOURCE_ID,SOURCE_URL,SOURCE_STATUS,AUTHORITY_NAME,DATA_TYPE,DATE_FORMAT,DATE_URL_CHECKED,INFORMATION_AVAILABLE,NOTES
+SRC001,https://www.aberdeenshire.gov.uk/schools/school-info/school-term-dates/,ACTIVE,Aberdeenshire,TO_ASSESS,,2026-09-14,,
+SRC002,https://www.bathnes.gov.uk/school-term-dates,ACTIVE,Bath & North East Somerset,TO_ASSESS,,2026-03-09,,
+SRC003,https://www.centralbedfordshire.gov.uk/schools-and-education/school-term-and-holiday-dates-central-bedfordshire,ACTIVE,Central Bedfordshire,TO_ASSESS,,2026-09-14,,
+SRC004,https://www.birmingham.gov.uk/info/20014/schools_and_learning/685/school_term_dates,ACTIVE,Birmingham,TO_ASSESS,,2026-09-14,,
+SRC005,https://www.bcpcouncil.gov.uk/schools-and-learning/school-term-and-holiday-dates,ACTIVE,"Bournemouth, Christchurch and Poole (BCP)",TO_ASSESS,,2026-09-14,,
+SRC006,https://bso.bradford.gov.uk/content/data-guidance-for-schools/term-dates,ACTIVE,Bradford,TO_ASSESS,,2026-09-14,,
+SRC007,https://www.bristol.gov.uk/schools-learning-early-years/school-term-and-holiday-dates,ACTIVE,Bristol,TO_ASSESS,,2026-09-14,,
+SRC008,https://www.buckinghamshire.gov.uk/schools-and-learning/schools-index/school-term-dates/,ACTIVE,Buckinghamshire,TO_ASSESS,,2026-09-14,,
+SRC009,http://www.cambridgeshire.gov.uk/info/20059/schools_and_learning/281/school_term_dates_and_closures,ACTIVE,Cambridgeshire,TO_ASSESS,,2026-09-14,,
+SRC010,https://www.cardiff.gov.uk/schooltermdates,ACTIVE,Cardiff,TO_ASSESS,,2026-09-14,,
+SRC011,https://www.cheshirewestandchester.gov.uk/residents/education-and-learning/school-term-and-holiday-dates,ACTIVE,Cheshire West and Chester,TO_ASSESS,,2026-09-14,,
+SRC012,https://www.cornwall.gov.uk/schools-and-education/schools-and-colleges/school-term-dates-and-inset-days/,ACTIVE,Cornwall,TO_ASSESS,,2026-09-14,,
+SRC013,https://www.coventry.gov.uk/schools-schooling/school-term-dates,ACTIVE,Coventry,TO_ASSESS,,2026-09-14,,
+SRC014,https://www.croydon.gov.uk/schools-and-education/schools/school-term-and-holiday-dates,ACTIVE,Croydon,TO_ASSESS,,2026-09-14,,
+SRC015,https://www.derby.gov.uk/education-and-learning/schools-and-colleges/term-holiday-dates/#page-1,ACTIVE,Derby,TO_ASSESS,,2026-09-14,,
+SRC016,https://www.derbyshire.gov.uk/education/schools/term-dates-school-holidays/school-term-dates-and-holidays.aspx,ACTIVE,Derbyshire,TO_ASSESS,,2026-09-14,,
+SRC017,https://www.devon.gov.uk/support-schools-settings/administration-and-finance/administration/term-dates/,ACTIVE,Devon,TO_ASSESS,,2026-09-14,,
+SRC018,https://www.doncaster.gov.uk/services/schools/school-holidays-and-term-dates,ACTIVE,Doncaster,TO_ASSESS,,2026-09-14,,
+SRC019,https://www.dorsetcouncil.gov.uk/w/school-term-holiday-dates,ACTIVE,Dorset,TO_ASSESS,,2026-09-14,,
+SRC020,https://www.dudley.gov.uk/residents/learning-and-school/school-information/school-term-dates/,ACTIVE,Dudley,TO_ASSESS,,2026-09-14,,
+SRC021,https://www.dundeecity.gov.uk/service-area/children-and-families-service/education/school-term-dates,ACTIVE,Dundee,TO_ASSESS,,2026-09-14,,
+SRC022,https://www.eastdunbarton.gov.uk/services/a-z-of-services/primary-secondary-and-early-years-education/school-holidays/,ACTIVE,East Dunbartonshire,TO_ASSESS,,2026-09-14,,
+SRC023,https://www.eastlothian.gov.uk/children-families-and-education/schools-and-learning/school-term-dates,ACTIVE,East Lothian,TO_ASSESS,,2026-03-09,,
+SRC024,https://eastrenfrewshire.gov.uk/school-holidays,ACTIVE,East Renfrewshire,TO_ASSESS,,2026-09-15,,
+SRC025,https://www.eastriding.gov.uk/learning/schools-colleges-and-academies/school-term-dates/,ACTIVE,East Riding of Yorkshire,TO_ASSESS,,2026-09-15,,
+SRC026,https://www.eastsussex.gov.uk/education-learning/term-dates,ACTIVE,East Sussex,TO_ASSESS,,2026-09-15,,
+SRC027,https://www.edinburgh.gov.uk/termdates,ACTIVE,Edinburgh,TO_ASSESS,,2026-09-15,,
+SRC028,https://www.enfield.gov.uk/services/children-and-education/term-dates,ACTIVE,Enfield,TO_ASSESS,,2026-09-15,,
+SRC029,https://www.essex.gov.uk/schools-and-learning/schools/essex-school-terms-and-holidays,ACTIVE,Essex,TO_ASSESS,,2026-09-15,,
+SRC030,https://events.falkirk.gov.uk/schools,ACTIVE,Falkirk,TO_ASSESS,,2026-09-15,,
+SRC031,"https://www.fife.gov.uk/closures/school-holidays,-term,-and-closure-dates",ACTIVE,Fife,TO_ASSESS,,2026-03-09,,
+SRC032,https://www.gateshead.gov.uk/article/2781/Term-dates,ACTIVE,Gateshead,TO_ASSESS,,2026-09-15,,
+SRC033,https://www.glasgow.gov.uk/article/4276/School-Term-Dates,ACTIVE,Glasgow,TO_ASSESS,,2026-09-15,,
+SRC034,https://www.gloucestershire.gov.uk/education-and-learning/term-dates/,ACTIVE,Gloucestershire,TO_ASSESS,,2026-09-15,,Shared source
+SRC035,https://www3.halton.gov.uk/Pages/EducationandFamilies/Schools/School-term-dates.aspx,ACTIVE,Halton,TO_ASSESS,,2026-09-15,,PDF calendar so may have complications with scraping
+SRC036,https://www.hants.gov.uk/educationandlearning/schoolholidays,ACTIVE,Hampshire,TO_ASSESS,,2026-09-15,,
+SRC037,https://www.havering.gov.uk/schools-education/school-term-holiday-dates,ACTIVE,Havering,TO_ASSESS,,2026-09-15,,PDF calendar so may have complications with scraping
+SRC038,https://www.hertfordshire.gov.uk/services/schools-and-education/at-school/school-term-dates/school-term-dates.aspx,ACTIVE,Hertfordshire,TO_ASSESS,,2026-03-09,,
+SRC039,https://www.inverclyde.gov.uk/education-and-learning/schools/schools-holidays,ACTIVE,Inverclyde,TO_ASSESS,,2026-09-15,,
+SRC040,https://www.kent.gov.uk/education-and-children/schools/term-dates,ACTIVE,Kent,TO_ASSESS,,2026-03-09,,
+SRC041,https://www.kirklees.gov.uk/beta/schools/school-term-dates.aspx,ACTIVE,Kirklees,TO_ASSESS,,2026-03-09,,Shared source
+SRC042,https://www.knowsley.gov.uk/education-and-schools/school-term-dates,ACTIVE,Knowsley,TO_ASSESS,,2026-09-15,,
+SRC043,https://www.lancashire.gov.uk/children-education-families/schools/school-term-dates-and-holidays/,ACTIVE,Lancashire,TO_ASSESS,,2026-09-15,,
+SRC044,https://www.leeds.gov.uk/schools-and-education/school-holidays-and-term-dates,ACTIVE,Leeds,TO_ASSESS,,2026-09-15,,
+SRC045,https://www.leicestershire.gov.uk/education-and-children/schools-colleges-and-academies/school-term-dates,ACTIVE,Leicestershire,TO_ASSESS,,2026-09-15,,Shared source
+SRC046,https://www.lincolnshire.gov.uk/school-attendance/school-term-times,ACTIVE,Lincolnshire,TO_ASSESS,,2026-09-15,,
+SRC047,https://liverpool.gov.uk/schools-and-learning/term-dates,ACTIVE,Liverpool,TO_ASSESS,,2026-09-15,,
+SRC048,https://www.manchester.gov.uk/schools-education-and-childcare/school-holidays-and-term-dates,ACTIVE,Manchester,TO_ASSESS,,2026-03-09,,
+SRC049,https://www.midlothian.gov.uk/info/878/schools/2/school_term_dates_and_holidays,ACTIVE,MidLothian,TO_ASSESS,,2026-09-15,,
+SRC050,https://www.newcastle.gov.uk/services/schools-learning-and-childcare/about-our-schools/school-term-dates,ACTIVE,Newcastle,TO_ASSESS,,2026-09-15,,
+SRC051,https://www.norfolk.gov.uk/education-and-learning/schools/term-dates/term-dates-and-school-holidays,ACTIVE,Norfolk,TO_ASSESS,,2026-09-15,,
+SRC052,https://www.north-ayrshire.gov.uk/education-and-learning/school-term-dates,ACTIVE,North Ayrshire,TO_ASSESS,,2026-09-15,,
+SRC053,https://www.northlanarkshire.gov.uk/schools-and-learning/school-holidays-and-term-dates,ACTIVE,North Lanarkshire,TO_ASSESS,,2026-03-09,,Shared source
+SRC054,https://www.northnorthants.gov.uk/schools-and-education/school-term-dates,ACTIVE,North Northamptonshire,TO_ASSESS,,2026-09-15,,
+SRC055,https://n-somerset.gov.uk/my-services/schools-learning/local-schools/school-term-dates,ACTIVE,North Somerset,TO_ASSESS,,2026-03-09,,
+SRC056,https://my.northtyneside.gov.uk/category/132/school-term-dates,ACTIVE,North Tyneside,TO_ASSESS,,2026-09-15,,
+SRC057,https://www.northyorks.gov.uk/school-term-and-holiday-dates,ACTIVE,North Yorkshire,TO_ASSESS,,2026-09-15,,
+SRC058,https://www.education-ni.gov.uk/articles/school-holidays,ACTIVE,Northern Ireland,TO_ASSESS,,2026-09-15,,Department of Education for all of Northern Ireland instead of a local authority
+SRC059,https://www.northumberland.gov.uk/education-skills/schools/school-term-and-holiday-dates,ACTIVE,Northumberland,TO_ASSESS,,2026-09-15,,
+SRC060,https://www.nottinghamcity.gov.uk/information-for-residents/education-and-schools/school-term-dates-and-holidays/,ACTIVE,Nottingham,TO_ASSESS,,2026-09-15,,
+SRC061,https://www.nottinghamshire.gov.uk/education/school-holidays-and-closures/school-holiday-and-term-dates,ACTIVE,Nottinghamshire,TO_ASSESS,,2026-09-15,,
+SRC062,https://www.pkc.gov.uk/article/19274/School-term-and-holiday-dates,ACTIVE,Perth and Kinross,TO_ASSESS,,2026-09-15,,
+SRC063,https://www.portsmouth.gov.uk/services/schools-learning-and-childcare/schools/school-term-dates/,ACTIVE,Portsmouth,TO_ASSESS,,2026-09-15,,
+SRC064,https://www.redbridge.gov.uk/schools/term-dates/,ACTIVE,Redbridge,TO_ASSESS,,2026-09-15,,
+SRC065,https://www1.renfrewshire.gov.uk/article/11856/School-term-dates-and-holidays,ACTIVE,Renfrewshire,TO_ASSESS,,2026-09-15,,
+SRC066,https://www.rctcbc.gov.uk/EN/Resident/SchoolsandLearning/Schooltermdatesinsetdaysandemergencies/Schooltermdates.aspx,ACTIVE,Rhondda Cynon Taf,TO_ASSESS,,2026-09-15,,
+SRC067,https://www.rotherham.gov.uk/schools-schooling/school-term-dates,ACTIVE,Rotherham,TO_ASSESS,,2026-09-15,,
+SRC068,https://www.salford.gov.uk/schools-and-learning/school-holidays/,ACTIVE,Salford,TO_ASSESS,,2026-09-15,,
+SRC069,https://www.sandwell.gov.uk/schools-education,ACTIVE,Sandwell,TO_ASSESS,,2026-03-09,,
+SRC070,https://www.scotborders.gov.uk/schools-learning/term-holiday-closure-dates/2,ACTIVE,Scottish Borders,TO_ASSESS,,2026-09-15,,
+SRC071,https://www.sefton.gov.uk/childrens-services/schools-and-learning/school-terms-and-holidays/,ACTIVE,Sefton,TO_ASSESS,,2026-09-15,,
+SRC072,https://www.sheffield.gov.uk/schools-childcare/school-information-term-dates,ACTIVE,Sheffield,TO_ASSESS,,2026-09-15,,
+SRC073,https://www.solihull.gov.uk/schools-and-learning/school-term-dates,ACTIVE,Solihull,TO_ASSESS,,2026-09-15,,
+SRC074,https://www.somerset.gov.uk/education-and-families/school-term-dates-and-holidays/,ACTIVE,Somerset,TO_ASSESS,,2026-09-15,,
+SRC075,https://www.south-ayrshire.gov.uk/article/24000/School-term-dates,ACTIVE,South Ayrshire,TO_ASSESS,,2026-09-15,,
+SRC076,https://find-information-for-adults-children-families.southglos.gov.uk/kb5/southglos/directory/advice.page?id=atD1tfGcubw&familychannel=2-7&channel=family#three,ACTIVE,South Gloucestershire,TO_ASSESS,,2026-09-15,,
+SRC077,https://www.southlanarkshire.gov.uk/info/200140/education_and_learning/82/school_holidays,ACTIVE,South Lanarkshire,TO_ASSESS,,2026-09-15,,Shared source
+SRC078,https://www.southtyneside.gov.uk/article/1098/Find-a-school-and-school-holiday-dates,NOT FEASIBLE,South Tyneside,TO_ASSESS,,2026-09-15,,"No central dates for authority, and instead individual schools are listed"
+SRC079,https://www.southampton.gov.uk/schools-learning/school-information/school-term-dates/,ACTIVE,Southampton,TO_ASSESS,,2026-09-15,,
+SRC080,https://www.sthelens.gov.uk/article/4601/School-term-dates,ACTIVE,St Helens,TO_ASSESS,,2026-09-15,,
+SRC081,https://www.staffordshire.gov.uk/Education/termdates.aspx,ACTIVE,Staffordshire,TO_ASSESS,,2026-09-15,,Shared source
+SRC082,https://www.stockport.gov.uk/school-term-dates,ACTIVE,Stockport,TO_ASSESS,,2026-09-15,,
+SRC083,https://www.stockton.gov.uk/school-holidays,ACTIVE,Stockton-on-Tees,TO_ASSESS,,2026-09-15,,Shared source
+SRC084,https://www.sunderland.gov.uk/school-holidays,ACTIVE,Sunderland,TO_ASSESS,,2026-09-15,,PDF calendar so may have complications with scraping
+SRC085,https://www.swansea.gov.uk/article/1033/School-term-holiday-dates-and-closures,ACTIVE,Swansea,TO_ASSESS,,2026-09-15,,
+SRC086,https://www.wakefield.gov.uk/schools-and-education/schools/school-term-and-holiday-dates,ACTIVE,Wakefield,TO_ASSESS,,2026-03-09,,
+SRC087,https://go.walsall.gov.uk/schools-and-learning/school-term-dates,ACTIVE,Walsall,TO_ASSESS,,2026-09-15,,
+SRC088,https://www.walthamforest.gov.uk/schools-education-and-learning/schools-and-colleges/school-term-and-holiday-dates,ACTIVE,Waltham Forest,TO_ASSESS,,2026-09-15,,PDF calendar so may have complications with scraping
+SRC089,https://www.warrington.gov.uk/schoolholidays,ACTIVE,Warrington,TO_ASSESS,,2026-09-15,,Shared source
+SRC090,https://www.warwickshire.gov.uk/schoolholidaydates,ACTIVE,Warwickshire,TO_ASSESS,,2026-09-15,,
+SRC091,https://www.west-dunbarton.gov.uk/schools-and-learning/schools/term-dates/,ACTIVE,West Dunbartonshire,TO_ASSESS,,2026-09-15,,
+SRC092,https://www.westlothian.gov.uk/school-holidays,ACTIVE,West Lothian,TO_ASSESS,,2026-03-09,,
+SRC093,https://www.westsussex.gov.uk/education-children-and-families/schools-and-colleges/school-term-dates/,ACTIVE,West Sussex,TO_ASSESS,,2026-09-15,,
+SRC094,https://www.wigan.gov.uk/Resident/Education/Schools/School-Term-Dates.aspx,ACTIVE,Wigan,TO_ASSESS,,2026-09-15,,PDF calendar so may have complications with scraping
+SRC095,https://www.wiltshire.gov.uk/article/1684/School-term-dates-and-holidays,ACTIVE,Wiltshire,TO_ASSESS,,2026-09-15,,Shared source
+SRC096,https://wirral.gov.uk/schools-and-learning/school-holidays-and-term-dates,ACTIVE,Wirral,TO_ASSESS,,2026-09-15,,
+SRC097,https://www.worcestershire.gov.uk/council-services/schools-education-and-learning/apply-school-place/school-term-dates,ACTIVE,Worcestershire,TO_ASSESS,,2026-03-09,,
+SRC098,https://www.york.gov.uk/attendance-truancy/school-term-dates,ACTIVE,York,TO_ASSESS,,2026-09-15,,
+SRC102,https://www.lbbd.gov.uk/schools-and-learning/schools-borough/school-term-dates-and-planned-closures,ACTIVE,Barking and Dagenham,TO_ASSESS,,2026-09-30,,
+SRC104,https://www.barnsley.gov.uk/services/schools-and-education/school-terms-and-holidays/,ACTIVE,Barnsley,TO_ASSESS,,2026-09-30,,
+SRC099,https://sites.aberdeencity.gov.uk/Council-Services/education-childcare-and-young-people/school-term-and-holiday-dates,ACTIVE,Aberdeen City,TO_ASSESS,,2026-09-30,,
+SRC100,https://www.angus.gov.uk/schools_and_young_people/school_holidays,ACTIVE,Angus,TO_ASSESS,,2026-09-30,,
+SRC101,https://www.argyll-bute.gov.uk/education-and-learning/schools/school-holidays,ACTIVE,Argyll and Bute,TO_ASSESS,,2026-09-30,,
+SRC103,https://www.barnet.gov.uk/schools-and-education/school-term-and-holiday-dates,ACTIVE,Barnet,TO_ASSESS,,2026-09-30,,
+SRC105,https://www.bedford.gov.uk/schools-education-and-childcare/schools-and-colleges/school-term-and-holiday-dates,ACTIVE,Bedford,TO_ASSESS,,2026-09-30,,
+SRC106,https://www.bexley.gov.uk/services/schools-and-education/school-term-and-holiday-dates/school-term-dates-2026-2027,ACTIVE,Bexley,TO_ASSESS,,2026-09-30,,
+SRC107,https://www.blackburn.gov.uk/schools-and-education/school-attendance/school-holidays,ACTIVE,Blackburn with Darwen,TO_ASSESS,,2026-09-30,,
+SRC108,https://www.blackpool.gov.uk/Residents/Education-and-schools/Blackpool-schools/School-dates.aspx,NOT FEASIBLE,Blackpool,TO_ASSESS,,2026-09-30,,Dates are set by individual schools and not the authority. None are available on the council website.
+SRC109,https://www.blaenau-gwent.gov.uk/en/resident/schools-learning/term-dates/,ACTIVE,Blaenau Gwent,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC110,https://www.bolton.gov.uk/school-information/school-term-dates,ACTIVE,Bolton,TO_ASSESS,,2026-09-30,,
+SRC111,https://www.bracknell-forest.gov.uk/schools-and-learning/schools/term-dates,ACTIVE,Bracknell Forest,TO_ASSESS,,2026-10-01,,
+SRC112,https://www.brent.gov.uk/education-schools-and-learning/community-school-term-dates,ACTIVE,Brent,TO_ASSESS,,2026-10-01,,
+SRC113,https://www.bridgend.gov.uk/residents/schools-and-education/term-dates/,ACTIVE,Bridgend,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC114,https://www.brighton-hove.gov.uk/schools-and-learning/school-information-and-support/school-term-and-holiday-dates,ACTIVE,Brighton and Hove,TO_ASSESS,,2026-10-01,,
+SRC115,https://www.bromley.gov.uk/schools-colleges/school-term-dates,ACTIVE,Bromley,TO_ASSESS,,2026-10-01,,
+SRC116,https://www.bury.gov.uk/schools-and-learning/school-term-dates,ACTIVE,Bury,TO_ASSESS,,2026-10-01,,
+SRC117,"https://www.caerphilly.gov.uk/services/schools-and-learning/schools,-term-dates-and-closures.aspx",ACTIVE,Caerphilly,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC118,https://new.calderdale.gov.uk/schools-and-learning/schools/school-term-dates,ACTIVE,Calderdale,TO_ASSESS,,2026-10-01,,
+SRC119,https://www.camden.gov.uk/term-dates,ACTIVE,Camden,TO_ASSESS,,2026-10-01,,
+SRC120,https://www.carmarthenshire.gov.wales/council-services/education-schools/school-term-dates/,ACTIVE,Carmarthenshire,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC121,https://www.ceredigion.gov.uk/resident/schools-education/school-information/school-term-dates/,ACTIVE,Ceredigion,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC122,https://www.cheshireeast.gov.uk/schools/school_term_dates_for_cheshire.aspx,ACTIVE,Cheshire East,TO_ASSESS,,2026-10-01,,
+SRC123,https://schoolholidays.org.uk/school/the-aldgate-school-london-100000,ACTIVE,City of London,TO_ASSESS,,2026-10-01,,"There are no dates on the City of London council webpage, so using the only state run school (The Aldgate School) in the district as the official source"
+SRC124,https://www.clacks.gov.uk/learning/schooltermdates/,ACTIVE,Clackmannanshire,TO_ASSESS,,2026-10-01,,
+SRC125,https://www.conwy.gov.uk/en/Resident/Education-and-Families/School-Holiday-Dates.aspx,ACTIVE,Conwy,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC126,https://www.durham.gov.uk/schoolholidays,ACTIVE,County Durham,TO_ASSESS,,2026-10-01,,
+SRC127,https://www.cumberland.gov.uk/schools-and-education/school-term-and-holiday-dates,ACTIVE,Cumberland,TO_ASSESS,,2026-10-01,,
+SRC128,https://www.darlington.gov.uk/education-and-learning/school-years/school-holiday-dates/,ACTIVE,Darlington,TO_ASSESS,,2026-10-01,,
+SRC129,https://www.denbighshire.gov.uk/en/education-and-schools/terms-and-training-days/term-dates.aspx,ACTIVE,Denbighshire,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC130,https://www.dumfriesandgalloway.gov.uk/schools-learning/schools/school-term-holiday-dates,ACTIVE,Dumfries and Galloway,TO_ASSESS,,2026-10-01,,
+SRC131,https://www.ealing.gov.uk/info/201123/your_child_at_school/119/term_and_holiday_dates/2,ACTIVE,Ealing,TO_ASSESS,,2026-10-01,,
+SRC132,https://www.east-ayrshire.gov.uk/educationandlearning/schoolholidays.aspx,ACTIVE,East Ayrshire,TO_ASSESS,,2026-10-01,,
+SRC133,https://www.flintshire.gov.uk/en/Resident/Schools/School-Holidays--Training-Days.aspx,ACTIVE,Flintshire,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC134,https://www.royalgreenwich.gov.uk/schools-and-education/school-term-dates,ACTIVE,Greenwich,TO_ASSESS,,2026-10-01,,
+SRC135,https://www.gwynedd.llyw.cymru/en-gb/schools-and-learning/school-term-dates-holidays,ACTIVE,Gwynedd,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC136,https://education.hackney.gov.uk/content/check-school-term-dates,ACTIVE,Hackney,TO_ASSESS,,2026-10-01,,
+SRC137,https://www.lbhf.gov.uk/children-and-young-people/schools-and-colleges/school-term-and-holiday-dates,ACTIVE,Hammersmith and Fulham,TO_ASSESS,,2026-10-01,,
+SRC138,https://haringey.gov.uk/schools-learning/schools/school-term-dates,ACTIVE,Haringey,TO_ASSESS,,2026-10-01,,
+SRC139,https://www.harrow.gov.uk/schools-learning/school-term-dates,ACTIVE,Harrow,TO_ASSESS,,2026-10-01,,
+SRC140,https://www.hartlepool.gov.uk/schools-education/school-term-dates,ACTIVE,Hartlepool,TO_ASSESS,,2026-10-01,,
+SRC141,https://www.herefordshire.gov.uk/schools-and-education/school-term-and-holiday-dates/,ACTIVE,"Herefordshire, County of",TO_ASSESS,,2026-10-01,,
+SRC142,https://www.highland.gov.uk/schools/school-term-dates,ACTIVE,Highland,TO_ASSESS,,2026-10-01,,
+SRC143,https://pre.hillingdon.gov.uk/schools-education/school-term-dates,ACTIVE,Hillingdon,TO_ASSESS,,2026-10-01,,
+SRC144,https://www.hounslow.gov.uk/schools-colleges/school-term-dates,ACTIVE,Hounslow,TO_ASSESS,,2026-10-01,,
+SRC145,https://www.anglesey.gov.wales/en/Residents/Schools-and-learning/Schools/School-term-dates.aspx,ACTIVE,Isle of Anglesey,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC146,https://www.iow.gov.uk/article/2429/School-term-dates-and-development-day-closures,ACTIVE,Isle of Wight,TO_ASSESS,,2026-10-01,,
+SRC147,https://fiveislands.scilly.sch.uk/term-dates/,ACTIVE,Isles of Scilly,TO_ASSESS,,2026-10-01,,"The isles of Scilly do not have council dates, so defulating to the local school five islands academy dates"
+SRC148,https://www.islington.gov.uk/children-and-families/schools/term-and-holiday-dates,ACTIVE,Islington,TO_ASSESS,,2026-10-02,,
+SRC149,https://www.rbkc.gov.uk/children-and-education/school-admissions/school-term-and-holiday-dates,ACTIVE,Kensington and Chelsea,TO_ASSESS,,2026-10-02,,
+SRC150,https://www.hull.gov.uk/schools-2/school-holidays-term-dates,ACTIVE,"Kingston upon Hull, City of",TO_ASSESS,,2026-10-02,,
+SRC151,https://www.kingston.gov.uk/schools-and-learning/kingston-adult-education/term-dates,ACTIVE,Kingston upon Thames,TO_ASSESS,,2026-10-02,,
+SRC152,https://www.lambeth.gov.uk/schools-education/school-term-holiday-dates,ACTIVE,Lambeth,TO_ASSESS,,2026-10-02,,
+SRC153,https://www.leicester.gov.uk/schools-and-education/term-dates,ACTIVE,Leicester,TO_ASSESS,,2026-10-02,,
+SRC154,https://lewisham.gov.uk/myservices/education/schools/school-term-dates,ACTIVE,Lewisham,TO_ASSESS,,2026-10-02,,
+SRC155,https://www.luton.gov.uk/schools-education/schools-colleges/school-terms-holidays,ACTIVE,Luton,TO_ASSESS,,2026-10-02,,
+SRC156,https://www.medway.gov.uk/info/200137/schools_and_learning/355/school_term_dates,ACTIVE,Medway,TO_ASSESS,,2026-10-02,,
+SRC157,https://www.merthyr.gov.uk/resident/learning-in-merthyr-tydfil/general-information/school-term-and-holiday-dates/,ACTIVE,Merthyr Tydfil,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC158,https://www.merton.gov.uk/education-and-learning/schools/school-term-dates-and-holidays,ACTIVE,Merton,TO_ASSESS,,2026-10-02,,
+SRC159,https://www.middlesbrough.gov.uk/schools-and-education/school-term-dates/,ACTIVE,Middlesbrough,TO_ASSESS,,2026-10-02,,
+SRC160,https://www.milton-keynes.gov.uk/schools-and-lifelong-learning/information-parents/school-term-dates-september-2026-july-2028,ACTIVE,Milton Keynes,TO_ASSESS,,2026-10-02,,
+SRC161,https://www.monmouthshire.gov.uk/school-term-dates/,ACTIVE,Monmouthshire,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC162,https://www.moray.gov.uk/learning-and-education/schools/school-term-dates-and-holidays/,ACTIVE,Moray,TO_ASSESS,,2026-10-02,,
+SRC163,https://www.cne-siar.gov.uk/education-and-learning/schools/school-holiday-and-term-dates,ACTIVE,Na h-Eileanan Siar,TO_ASSESS,,2026-10-02,,
+SRC164,https://www.npt.gov.uk/schools-and-learning/schools/school-term-dates/,ACTIVE,Neath Port Talbot,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC165,https://www.newham.gov.uk/downloads/download/2922/school-term-and-holiday-dates,ACTIVE,Newham,TO_ASSESS,,2026-10-02,,
+SRC166,https://www.newport.gov.uk/schools-and-learning/schools-and-learning/term-dates,ACTIVE,Newport,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC167,https://www.nelincs.gov.uk/children-families-and-schools/school-term-dates/,ACTIVE,North East Lincolnshire,TO_ASSESS,,2026-10-02,,
+SRC168,https://www.northlincs.gov.uk/schools-libraries-and-learning/schools-colleges-and-further-education/school-term-dates/,ACTIVE,North Lincolnshire,TO_ASSESS,,2026-10-02,,
+SRC169,https://www.oldham.gov.uk/info/200226/schools/1960/school_holidays,ACTIVE,Oldham,TO_ASSESS,,2026-10-02,,
+SRC170,https://www.orkney.gov.uk/schools-and-learning/schools/about-our-schools,ACTIVE,Orkney Islands,TO_ASSESS,,2026-10-02,,
+SRC171,https://www.oxfordshire.gov.uk/schools/term-dates-and-holidays,ACTIVE,Oxfordshire,TO_ASSESS,,2026-10-02,,
+SRC172,https://www.pembrokeshire.gov.uk/pembrokeshire-schools/term-dates-and-school-holidays,ACTIVE,Pembrokeshire,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC173,https://www.peterborough.gov.uk/schools-and-education/term-dates,ACTIVE,Peterborough,TO_ASSESS,,2026-10-02,,
+SRC174,https://www.plymouth.gov.uk/school-term-dates-and-holidays,ACTIVE,Plymouth,TO_ASSESS,,2026-10-02,,
+SRC175,https://en.powys.gov.uk/article/1166/School-Term-Dates,ACTIVE,Powys,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC176,https://brighterfuturesforchildren.org/for-parents-carers/schools/term-dates/?mode=1,ACTIVE,Reading,TO_ASSESS,,2026-10-02,,
+SRC177,https://www.redcar-cleveland.gov.uk/schools-and-education/school-terms-and-holiday-dates,ACTIVE,Redcar and Cleveland,TO_ASSESS,,2026-10-02,,
+SRC178,https://www.richmonduponthamesschool.org.uk/page/?title=Term+Dates&pid=20,ACTIVE,Richmond upon Thames,TO_ASSESS,,2026-10-02,,
+SRC179,https://www.rochdale.gov.uk/schools/school-terms-holiday-dates-closures,ACTIVE,Rochdale,TO_ASSESS,,2026-10-02,,
+SRC180,https://www.rutland.gov.uk/education-learning/term-dates,ACTIVE,Rutland,TO_ASSESS,,2026-10-02,,
+SRC181,https://www.shetland.gov.uk/schools/term-dates,ACTIVE,Shetland Islands,TO_ASSESS,,2026-10-02,,
+SRC182,https://next.shropshire.gov.uk/schools-and-education/term-time-and-holiday-dates/,ACTIVE,Shropshire,TO_ASSESS,,2026-10-02,,
+SRC183,https://www.slough.gov.uk/schools-slough/school-term-dates,ACTIVE,Slough,TO_ASSESS,,2026-10-02,,
+SRC184,https://www.southend.gov.uk/schools-colleges-university-essex/term-dates,ACTIVE,Southend-on-Sea,TO_ASSESS,,2026-10-02,,
+SRC185,https://www.southwark.gov.uk/schools-and-education/school-term-and-holiday-dates,ACTIVE,Southwark,TO_ASSESS,,2026-10-02,,
+SRC186,https://www.stirling.gov.uk/schools-and-learning/schools/school-term-dates-and-holidays/,ACTIVE,Stirling,TO_ASSESS,,2026-10-02,,
+SRC187,https://www.stoke.gov.uk/info/20007/schools_and_education/22/term_dates,ACTIVE,Stoke-on-Trent,TO_ASSESS,,2026-10-02,,
+SRC188,https://www.suffolk.gov.uk/children-families-and-learning/schools/school-term-and-holiday-dates,ACTIVE,Suffolk,TO_ASSESS,,2026-10-02,,
+SRC189,https://www.surreycc.gov.uk/schools-and-learning/schools/term-dates,ACTIVE,Surrey,TO_ASSESS,,2026-10-02,,
+SRC190,https://www.sutton.gov.uk/schools-and-learning/school-admissions/school-term-dates,ACTIVE,Sutton,TO_ASSESS,,2026-10-02,,
+SRC191,https://www.swindon.gov.uk/info/20032/schools_and_education/14/dates_for_school_terms_and_holidays,ACTIVE,Swindon,TO_ASSESS,,2026-10-02,,
+SRC192,https://www.tameside.gov.uk/education/governors/pupil-days-holidays-and-term-times-for-primary-s,ACTIVE,Tameside,TO_ASSESS,,2026-10-02,,
+SRC193,https://www.telford.gov.uk/schools-and-learning/school-term-dates/,ACTIVE,Telford and Wrekin,TO_ASSESS,,2026-10-02,,
+SRC194,https://www.thurrock.gov.uk/school-calendars/school-calendar-202627,ACTIVE,Thurrock,TO_ASSESS,,2026-10-02,,Only links to specific years are available
+SRC195,https://www.torbay.gov.uk/schools-and-learning/term-dates/,ACTIVE,Torbay,TO_ASSESS,,2026-10-02,,
+SRC196,https://www.torfaen.gov.uk/en/schools-and-learning/schools/school-term-and-holiday-dates,ACTIVE,Torfaen,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC197,https://www.towerhamlets.gov.uk/lgnl/education_and_learning/schools/term_and_holiday_dates.aspx,ACTIVE,Tower Hamlets,TO_ASSESS,,2026-10-02,,
+SRC198,https://www.trafford.gov.uk/schools-and-learning/term-dates-and-holidays,ACTIVE,Trafford,TO_ASSESS,,2026-10-02,,
+SRC199,https://www.valeofglamorgan.gov.uk/en/living/schools/School-Term-Dates.aspx,ACTIVE,Vale of Glamorgan,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC200,https://www.wandsworth.gov.uk/schools-and-admissions/schools/school-term-dates/,ACTIVE,Wandsworth,TO_ASSESS,,2026-10-02,,
+SRC201,https://www.westberks.gov.uk/article/40477/Find-School-Term-Dates,ACTIVE,West Berkshire,TO_ASSESS,,2026-10-02,,
+SRC202,https://www.westnorthants.gov.uk/early-years-schools-and-education/term-dates,ACTIVE,West Northamptonshire,TO_ASSESS,,2026-10-02,,
+SRC203,https://www.westminster.gov.uk/children-and-families/education/school-term-and-holiday-dates,ACTIVE,Westminster,TO_ASSESS,,2026-10-02,,
+SRC204,https://www.westmorlandandfurness.gov.uk/schools-and-education/school-term-and-holiday-dates,ACTIVE,Westmorland and Furness,TO_ASSESS,,2026-10-02,,
+SRC205,https://www.rbwm.gov.uk/schools-and-education/school-term-dates,ACTIVE,Windsor and Maidenhead,TO_ASSESS,,2026-10-02,,
+SRC206,https://www.wokingham.gov.uk/schools-and-education/school-information-and-services/schools-and-education/school-information-and-services/school-term-dates-and-school-holidays,ACTIVE,Wokingham,TO_ASSESS,,2026-10-02,,
+SRC207,https://www.wolverhampton.gov.uk/education-and-schools/school-term-dates,ACTIVE,Wolverhampton,TO_ASSESS,,2026-10-02,,
+SRC208,https://www.wrexham.gov.uk/school-term-dates,ACTIVE,Wrexham,TO_ASSESS,,2026-10-01,,Dates are also available form the Welsh governement webpage
+SRC209,https://www.gov.wales/school-terms-holidays-and-closures#guidance-and-services,ACTIVE,Wales,TO_ASSESS,,2026-09-30,,Welsh government website is an accumulation of dates from the different county websites
