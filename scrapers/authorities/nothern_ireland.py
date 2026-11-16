@@ -10,11 +10,13 @@
 # Keep imports in this cell so the scraper can be run independently of the notebook library setup.
 import re
 from datetime import datetime, timezone
-
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from IPython.display import display
+
+
+
+# ----------------------------------------- Configuration -----------------------------------------
 
 # Identify the source and provide the request headers used to retrieve its published page.
 SOURCE_ID  = "SRC058"
@@ -93,22 +95,3 @@ def scrape_northern_ireland():
 
     return pd.DataFrame.from_records(records
                                     ,columns = OUTPUT_COLUMNS)
-
-
-
-# --------------------------------------------- Output ---------------------------------------------
-
-# Display the raw extract in source order and save the same event-grain dataset to the existing CSV
-# handoff path; downstream parsing can use RAW_DATE_TEXT without losing the published wording.
-DATA__NORTHERN_IRELAND_SCHOOL_HOLIDAYS_RAW = scrape_northern_ireland()
-DATA__NORTHERN_IRELAND_SCHOOL_HOLIDAYS_RAW.to_csv("northern_ireland_raw.csv"
-                                                  ,index = False)
-display(DATA__NORTHERN_IRELAND_SCHOOL_HOLIDAYS_RAW)
-
-
-
-# -------------------------------------------- Cleanup ---------------------------------------------
-
-# Remove the construction-only scraper after extraction; retain imports, source configuration and
-# the durable dataframe for independent reruns and downstream inspection.
-del scrape_northern_ireland
