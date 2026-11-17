@@ -87,14 +87,17 @@ def scrape_aberdeenshire():
                         ,"html.parser")
     records = []
 
-    # Only process headings that match the academic-year format published by the council.
-    year_pattern = re.compile(r"^\d{4}/\d{2}$")
+    # Identify academic-year headings, allowing for additional text after the year.
+    year_pattern = re.compile(r"(\d{4}/\d{2})")
 
     for heading in soup.find_all("h2"):
-        academic_year = heading.get_text(" ", strip = True)
+        heading_text = heading.get_text(" ", strip = True)
+        match = year_pattern.search(heading_text)
 
-        if not year_pattern.fullmatch(academic_year):
+        if match is None:
             continue
+
+        academic_year = match.group(1)
 
         if academic_year not in ACADEMIC_YEARS:
             continue
