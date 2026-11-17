@@ -1,33 +1,34 @@
 
 # -------------------------------------------- Overview --------------------------------------------
 
-# Load and retrieve source metadata from the central sources.csv register.
-# This keeps source URLs and authority information in one place, rather than hardcoding them
-# in individual scraping modules.
+# Load and retrieve source metadata from the central source register so scraping modules do not
+# duplicate URLs, authorities and other configuration details.
 
 
 
-# --------------------------------------------- Imports ---------------------------------------------
+# --------------------------------------------- Imports --------------------------------------------
 
 import pandas as pd
 
 
 
-# -------------------------------------------- Configuration ---------------------------------------
+# --------------------------------------------- Input ----------------------------------------------
 
-# Path to the central source register.
+# The canonical metadata source that defines every scraper's configuration.
 SOURCES_PATH = "config/sources.csv"
 
 
 
-# ---------------------------------------------- Functions -----------------------------------------
+# ------------------------------------------- Main Code --------------------------------------------
 
+# Return the central source register so downstream scrapers can resolve metadata consistently.
 def load_sources():
-    """
-    Load the source register into a pandas DataFrame.
 
-    Returns:
-        pd.DataFrame: All source records from sources.csv.
+    """
+    Return the source register as a pandas DataFrame.
+
+    This keeps scraper configuration in one place and avoids scattering source metadata across
+    individual modules.
     """
 
     sources = pd.read_csv(SOURCES_PATH)
@@ -35,31 +36,36 @@ def load_sources():
     return sources
 
 
+# Retrieve a single source record by SOURCE_ID and fail clearly when it is missing.
 def get_source(source_id):
+
     """
-    Retrieve a single source record using its SOURCE_ID.
+    Return the matching source record for a given SOURCE_ID.
 
-    Args:
-        source_id (str): Unique identifier for the source.
+    This is intended for lookup-only access by scraping modules that need a single source's
+    metadata. The function raises a clear error so callers can fail fast when a source is not
+    registered.
 
-    Returns:
-        pd.Series: The matching source record.
+    Parameters
+    ----------
+    source_id : str
+        Unique source identifier, e.g. 'MY_SOURCE'.
 
-    Raises:
-        ValueError: If the SOURCE_ID does not exist in the source register.
+    Returns
+    -------
+    pd.Series
+        The matching row from the central source register.
+
+    Raises
+    ------
+    ValueError
+        Raised when `source_id` does not exist in `config/sources.csv`.
     """
 
-    # Load the source register.
     sources = load_sources()
+    source = sources.loc[sources["SOURCE_ID"].eq(source_id), :].copy()
 
-    # Filter the register to the requested source ID.
-    source = sources.loc[
-        sources["SOURCE_ID"] == source_id
-    ]
-
-    # Check that the requested source ID exists.
     if source.empty:
         raise ValueError(f"Unknown SOURCE_ID: {source_id}")
 
-    # Return the matching source record.
     return source.iloc[0]
