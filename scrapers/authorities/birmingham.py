@@ -31,10 +31,10 @@ OUTPUT_COLUMNS = ["SOURCE_ID"
                  ,"DATE_SCRAPED"]
 
 YEAR_PATTERN = re.compile(r"(\d{4})\s+to\s+(\d{4})")
-TERM_PATTERN = re.compile(r"^(Autumn|Spring|Summer)\s+Term", re.IGNORECASE)
+TERM_PATTERN = re.compile(r"^(Autumn|Spring|Summer)\s+term", re.IGNORECASE)
 
 EVENT_PATTERN = re.compile(
-    r"^(Term starts|Half-term|Term ends)\s*:\s*(.+)$"
+    r"(Term starts|Half-term|Term ends)\s*:\s*(.*?)(?=Term starts\s*:|Half-term\s*:|Term ends\s*:|$)"
     ,re.IGNORECASE
 )
 
@@ -67,62 +67,64 @@ def scrape_birmingham():
     # Process each academic-year section independently.
     for heading in soup.find_all("h2"):
 
-        heading_text = heading.get_text(" ", strip = True)
-        year_match = YEAR_PATTERN.search(heading_text)
+        year_match = YEAR_PATTERN.search(heading.get_text(" ", strip = True))
 
         if year_match is None:
             continue
 
         academic_year = f"{year_match.group(1)}/{year_match.group(2)[-2:]}"
-        current_term = None
 
-        # Extract events until the next academic-year heading.
+        # Extract term information until the next academic-year heading.
         for element in heading.next_elements:
 
             if element is not heading and getattr(element, "name", None) == "h2":
                 break
 
-            # Identify the term associated with subsequent events.
-            if getattr(element, "name", None) == "h3":
-
-                term_match = TERM_PATTERN.search(
-                    element.get_text(" ", strip = True)
-                )
-
-                if term_match:
-                    current_term = term_match.group(1).title()
-
+            if getattr(element, "name", None) != "h3":
                 continue
 
-            if getattr(element, "name", None) not in ["p", "li"]:
+            term_match = TERM_PATTERN.search(element.get_text(" ", strip = True))
+
+            if term_match is None:
                 continue
 
-            # Avoid processing a paragraph twice if it is nested inside a list item.
-            if element.name == "p" and element.find_parent("li") is not None:
-                continue
+            term_name = term_match.group(1).title()
 
-            event_text = element.get_text(" ", strip = True)
-            event_match = EVENT_PATTERN.match(event_text)
+            # Find the text block immediately following the term heading.
+            for content in element.next_elements:
 
-            if event_match is None or current_term is None:
-                continue
+                if getattr(content, "name", None) in ["h2", "h3"]:
+                    break
 
-            event_type = event_match.group(1).lower()
-            raw_date_text = event_match.group(2).strip()
+                if getattr(content, "name", None) not in ["p", "li"]:
+                    continue
 
-            if event_type == "term starts":
-                event_name = f"{current_term} term starts"
+                if content.find_parent(["p", "li"]) is not None:
+                    continue
 
-            elif event_type == "half-term":
-                event_name = f"{current_term} half-term"
+                term_text = content.get_text(" ", strip = True)
 
-            else:
-                event_name = f"{current_term} term ends"
+                for event_match in EVENT_PATTERN.finditer(term_text):
 
-            records.append({"SOURCE_ID"     : SOURCE_ID
-                           ,"ACADEMIC_YEAR" : academic_year
-                           ,"EVENT_NAME"    : event_name
-                           ,"RAW_DATE_TEXT" : raw_date_text
-                           ,"DATE_SCRAPED"  : datetime.now(timezone.utc).date()})
+                    event_type = event_match.group(1).lower()
+                    raw_date_text = event_match.group(2).strip()
+
+                    if event_type == "term starts":
+                        event_name = f"{term_name} term starts"
+
+                    elif event_type == "half-term":
+                        event_name = f"{term_name} half-term"
+
+                    else:
+                        event_name = f"{term_name} term ends"
+
+                    records.append({"SOURCE_ID"     : SOURCE_ID
+                                   ,"ACADEMIC_YEAR" : academic_year
+                                   ,"EVENT_NAME"    : event_name
+                                   ,"RAW_DATE_TEXT" : raw_date_text
+                                   ,"DATE_SCRAPED"  : datetime.now(timezone.utc).date()})
+
+                # Only process the first text block following the term heading.
+                break
 
     return pd.DataFrame.from_records(records, columns=OUTPUT_COLUMNS)
