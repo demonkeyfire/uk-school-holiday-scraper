@@ -40,11 +40,12 @@ This supplements the existing requirement for business-readable comments by defi
 Structure larger durable cells with these sections:
 
 ```python
-# -------------------------------------------- Overview --------------------------------------------
-# --------------------------------------------- Input ----------------------------------------------
-# ------------------------------------------- Main Code --------------------------------------------
-# --------------------------------------------- Output ---------------------------------------------
-# -------------------------------------------- Cleanup ---------------------------------------------
+# -------------------------------------------- Overview -------------------------------------------
+# -------------------------------------------- Imports --------------------------------------------
+# --------------------------------------------- Input ---------------------------------------------
+# ------------------------------------------- Main Code -------------------------------------------
+# --------------------------------------------- Output --------------------------------------------
+# -------------------------------------------- Cleanup --------------------------------------------
 ```
 
 Under **Overview**, add one or two concise comments describing:
@@ -83,17 +84,77 @@ SOURCE_CONFIG = {
                        ,'ARRIVAL_DEADLINE_UTC' : '05:25:00'}}
 ```
 
-## Function docstring spacing
+## Function docstrings
 
-- In function definitions, leave one empty line between the function signature and its docstring, and one empty line between the docstring and the first executable statement. This visually isolates the docstring for easy scanning while keeping it as the function's first statement.
+### Spacing
+
+- Leave one empty line between the function signature and its docstring, and one empty line between the docstring and the first executable statement.
 - Apply the same spacing to single-line and multi-line docstrings.
 
+### Format
+
+- Use a one-line `"""..."""` docstring only for small helpers that are obvious from their name and signature.
+- For multi-line docstrings, put the opening and closing `"""` on their own lines, indented to match the function body.
+- Wrap docstring text at about 79 characters.
+- Open with a short imperative summary of what the function does and under what conditions.
+- Follow with short paragraphs explaining *why* the function exists, which failure modes it guards against, and any portability or sharing assumptions (for example, no upstream references, safe to use as a Hex component).
+- Use NumPy-style section headings, each underlined with dashes to the same length as the heading:
+  - `Parameters`
+  - `Returns`
+  - Optional: `Raises`, `Notes`, `Examples` where they add value
+- Separate sections with one empty line.
+
+### Parameters
+
+- Document every parameter as `name : type` on its own line, with the description indented four spaces underneath.
+- Give an example value for string identifiers, e.g. `'MY_TABLE'`.
+- State explicitly whether a parameter is required or has a default. Where a default is deliberately absent or chosen for safety, say why.
+- For flags or modes, list each option on its own line with the `=` signs aligned.
+- Put longer reasoning or caller responsibilities in an indented paragraph after the option list.
+- Wrap code identifiers in backticks, e.g. `conn`, `status`.
+
+### Returns
+
+- State the return type on its own line, with the description indented underneath.
+- For dictionaries, list the keys in an aligned two-column layout: key name(s) on the left, meaning on the right. Related keys may share a line.
+- List every possible value of status or enum-like keys.
+- End with a short note on how callers should use the result, e.g. branch on `status` rather than parsing `message`.
+
 ```python
-def authority_key(value):
+def write_table(df
+               ,table_name
+               ,overwrite = True):
 
-    """Return a normalised matching key for an authority name."""
+    """
+    Write a DataFrame to a warehouse table when it is non-empty.
 
-    return normalise_authority_name(value)
+    This prevents accidental empty overwrites during development reruns.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The DataFrame to write.
+    table_name : str
+        Destination table name, e.g. 'MY_TABLE'.
+    overwrite : bool
+        True  = REPLACE the target table with df (the default).
+        False = APPEND df to the target table.
+
+    Returns
+    -------
+    dict
+        Structured status for the attempted write, with keys:
+            table_name              target table
+            written                 True only if a write happened
+            status                  one of:
+                                      'written'
+                                      'skipped_empty_dataframe'
+            message                 printable summary
+
+        Callers should branch on `status` rather than parsing `message`.
+    """
+
+    ...
 ```
 
 ## Multiline indentation and delimiters
