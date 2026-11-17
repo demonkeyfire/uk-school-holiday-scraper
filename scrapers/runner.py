@@ -10,9 +10,10 @@
 
 import pandas as pd
 
-from scrapers.authorities.northern_ireland         import scrape_northern_ireland
 from scrapers.authorities.aberdeenshire            import scrape_aberdeenshire
 from scrapers.authorities.bath_north_east_somerset import scrape_bath_north_east_somerset
+from scrapers.authorities.central_bedfordshire     import scrape_central_bedfordshire
+from scrapers.authorities.northern_ireland         import scrape_northern_ireland
 
 
 
@@ -21,6 +22,7 @@ from scrapers.authorities.bath_north_east_somerset import scrape_bath_north_east
 # Register the available authority scrapers using their SOURCE_ID as the key.
 SCRAPERS = {"SRC001": scrape_aberdeenshire
            ,"SRC002": scrape_bath_north_east_somerset
+           ,"SRC003": scrape_central_bedfordshire
            ,"SRC058": scrape_northern_ireland}
 
 # Define the columns returned by the authority scrapers.
