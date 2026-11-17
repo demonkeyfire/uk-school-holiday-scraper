@@ -1,3 +1,4 @@
+
 # -------------------------------------------- Overview --------------------------------------------
 
 # Retrieve Northern Ireland school-holiday rows from the published page. The output is one row per
@@ -14,14 +15,17 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+from scrapers.source_config import get_source
+
 
 
 # --------------------------------------------- Input ----------------------------------------------
 
-# Keep the page metadata and output schema explicit so the scraper can be reused or audited easily.
-SOURCE_ID  = "SRC058"
-SOURCE_URL = "https://www.education-ni.gov.uk/articles/school-holidays"
-HEADERS    = {"User-Agent" : "SchoolHolidayResearch/1.0"}
+# Identify the source using its unique ID in the central sources.csv register.
+SOURCE_ID = "SRC058"
+
+# Define the request headers used when retrieving the published page.
+HEADERS = {"User-Agent": "SchoolHolidayResearch/1.0"}
 
 # Keep the extracted column order explicit so an empty result still has a stable schema.
 OUTPUT_COLUMNS = ("SOURCE_ID"
@@ -41,6 +45,8 @@ def scrape_northern_ireland():
     """
     Return raw school-holiday event rows from the Northern Ireland source page.
 
+    The source URL is retrieved from the central sources.csv register using SOURCE_ID.
+
     This scraper preserves the published ordering and raw date text, leaving all date parsing to the
     downstream normalisation step.
 
@@ -55,14 +61,22 @@ def scrape_northern_ireland():
             DATE_SCRAPED
     """
 
-    response = requests.get(SOURCE_URL
+    # Retrieve the source metadata, including its URL, from the central source register.
+    source = get_source(SOURCE_ID)
+    source_url = source["SOURCE_URL"]
+
+    # Retrieve the official page.
+    response = requests.get(source_url
                            ,headers = HEADERS
                            ,timeout = 30)
     response.raise_for_status()
 
+    # Parse the returned HTML content.
     soup = BeautifulSoup(response.content
                         ,"html.parser")
     records = []
+
+    # Identify headings containing academic-year labels.
     year_pattern = re.compile(r"School holidays\s+(\d{4})\s*/\s*(\d{4})"
                              ,re.IGNORECASE)
     headings = soup.find_all(re.compile(r"^h[1-6]$"))
@@ -75,6 +89,7 @@ def scrape_northern_ireland():
         academic_year = f"{match.group(1)}/{match.group(2)}"
         table = None
 
+        # Locate the first table within the current academic-year section.
         for element in heading.next_elements:
             element_name = getattr(element, "name", None)
 
@@ -90,6 +105,7 @@ def scrape_northern_ireland():
             print(f"No table found: {academic_year}")
             continue
 
+        # Extract event names and their corresponding raw date text.
         for row in table.find_all("tr"):
             cells = row.find_all(["td", "th"])
             if len(cells) < 2:
@@ -98,6 +114,7 @@ def scrape_northern_ireland():
             event = cells[0].get_text(" ", strip = True)
             raw_dates = cells[1].get_text(" ", strip = True)
 
+            # Skip table headers and empty rows.
             if event.lower() == "event" or not event or not raw_dates:
                 continue
 

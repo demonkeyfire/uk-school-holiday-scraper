@@ -1,3 +1,4 @@
+
 # -------------------------------------------- Overview --------------------------------------------
 
 # Retrieve Aberdeenshire school-term and holiday events from the published page.
@@ -14,21 +15,26 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+from scrapers.source_config import get_source
+
 
 
 # --------------------------------------------- Input ----------------------------------------------
 
-# Keep the page metadata and output schema explicit so the scraper can be reused or audited easily.
-SOURCE_ID  = "SRC001"
-SOURCE_URL = "https://www.aberdeenshire.gov.uk/schools/school-info/school-term-dates/"
-HEADERS    = {"User-Agent" : "SchoolHolidayResearch/1.0"}
+# Identify the source using its unique ID in the central sources.csv register.
+SOURCE_ID = "SRC001"
 
+# Define the request headers used when retrieving the published page.
+HEADERS = {"User-Agent": "SchoolHolidayResearch/1.0"}
+
+# Define the columns returned by the scraper.
 OUTPUT_COLUMNS = ["SOURCE_ID"
                  ,"ACADEMIC_YEAR"
                  ,"EVENT_NAME"
                  ,"RAW_DATE_TEXT"
                  ,"DATE_SCRAPED"]
 
+# Restrict extraction to the academic years currently required.
 ACADEMIC_YEARS = {"2026/27"
                  ,"2027/28"
                  ,"2028/29"
@@ -50,6 +56,8 @@ def scrape_aberdeenshire():
     """
     Return raw school-term and holiday events from the Aberdeenshire source page.
 
+    The source URL is retrieved from the central sources.csv register using SOURCE_ID.
+
     This scraper preserves the source's publication wording and date span text so downstream
     cleaning can parse and normalise dates consistently.
 
@@ -64,11 +72,17 @@ def scrape_aberdeenshire():
             DATE_SCRAPED
     """
 
-    response = requests.get(SOURCE_URL
+    # Retrieve the source metadata, including its URL, from the central source register.
+    source = get_source(SOURCE_ID)
+    source_url = source["SOURCE_URL"]
+
+    # Retrieve the published page.
+    response = requests.get(source_url
                            ,headers = HEADERS
                            ,timeout = 30)
     response.raise_for_status()
 
+    # Parse the returned HTML content.
     soup = BeautifulSoup(response.content
                         ,"html.parser")
     records = []
