@@ -71,6 +71,11 @@ The Buckinghamshire scraper follows the calendar download link on the council we
 combines its detailed Excel calendar with the webpage dates. Calendar dates take precedence
 where the two sources overlap.
 
+The Aberdeenshire scraper reads the term-date page and follows its linked iCalendar download for
+each available year (currently 2026/27 through 2029/30). Calendar dates take precedence where the
+sources overlap, and webpage-only date portions are retained. The iCalendar's exclusive `DTEND`
+values are converted to inclusive school-date ranges.
+
 Example:
 
 ```bash
