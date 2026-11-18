@@ -10,15 +10,16 @@
 
 import pandas as pd
 
-from scrapers.authorities.aberdeenshire                     import scrape_aberdeenshire
-from scrapers.authorities.bath_north_east_somerset          import scrape_bath_north_east_somerset
-from scrapers.authorities.central_bedfordshire              import scrape_central_bedfordshire
-from scrapers.authorities.birmingham                        import scrape_birmingham
-from scrapers.authorities.bournemouth_christchurch_poole    import scrape_bournemouth_christchurch_poole
-from scrapers.authorities.bradford                          import scrape_bradford
-from scrapers.authorities.bristol                           import scrape_bristol
-from scrapers.authorities.buckinghamshire                   import scrape_buckinghamshire
-from scrapers.authorities.northern_ireland                  import scrape_northern_ireland
+from scrapers.authorities.src001_aberdeenshire                  import scrape_aberdeenshire
+from scrapers.authorities.src002_bath_north_east_somerset       import scrape_bath_north_east_somerset
+from scrapers.authorities.src003_central_bedfordshire           import scrape_central_bedfordshire
+from scrapers.authorities.src004_birmingham                     import scrape_birmingham
+from scrapers.authorities.src005_bournemouth_christchurch_poole import scrape_bournemouth_christchurch_poole
+from scrapers.authorities.src006_bradford                       import scrape_bradford
+from scrapers.authorities.src007_bristol                        import scrape_bristol
+from scrapers.authorities.src008_buckinghamshire                import scrape_buckinghamshire
+from scrapers.authorities.src009_cambridgeshire                 import scrape_cambridgeshire
+from scrapers.authorities.src058_northern_ireland               import scrape_northern_ireland
 
 
 
@@ -33,6 +34,7 @@ SCRAPERS = {"SRC001": scrape_aberdeenshire
            ,"SRC006": scrape_bradford
            ,"SRC007": scrape_bristol
            ,"SRC008": scrape_buckinghamshire
+           ,"SRC009": scrape_cambridgeshire
            ,"SRC058": scrape_northern_ireland}
 
 # Define the columns returned by the authority scrapers.
