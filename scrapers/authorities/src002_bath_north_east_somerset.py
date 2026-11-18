@@ -52,18 +52,19 @@ PDF_YEAR_PATTERN = re.compile(
 # Match term date ranges extracted from the PDF.
 TERM_PATTERN = re.compile(
     r"\bTerm\s+(?P<term_number>[1-6])\s+"
-    r"(?P<start_day>\d{1,2})\s+(?P<start_month>[A-Za-z]+)\s*[–-]\s*"
-    r"(?P<end_day>\d{1,2})\s+(?P<end_month>[A-Za-z]+)\s+"
+    r"(?P<start_day>\d{1,2})\s*(?P<start_month>[A-Za-z]+)\s*[–-]\s*"
+    r"(?P<end_day>\d{1,2})\s*(?P<end_month>[A-Za-z]+)\s*"
     r"(?P<end_year>\d{4})\b"
     ,re.IGNORECASE
 )
 
 # Match bank holiday entries extracted from the PDF.
 BANK_HOLIDAY_PATTERN = re.compile(
-    r"^\s*(?P<event_name>.+?)\s*[–-]\s*"
-    r"(?P<day>\d{1,2})(?:st|nd|rd|th)?\s+"
-    r"(?P<month>[A-Za-z]+)\s+(?P<year>\d{4})\b"
-    ,re.IGNORECASE | re.MULTILINE
+    r"(?P<event_name>Christmas Day|Boxing Day|New Year's Day|New Year’s Day|"
+    r"Good Friday|Easter Monday|May Day|Spring Bank Holiday|Summer Bank Holiday)"
+    r"\s*[–-]\s*(?P<day>\d{1,2})(?:st|nd|rd|th)?\s*"
+    r"(?P<month>[A-Za-z]+)\s*(?P<year>\d{4})\b"
+    ,re.IGNORECASE
 )
 
 
@@ -280,6 +281,12 @@ def parse_calendar_text(calendar_text, academic_year, date_scraped):
     if len(bank_holiday_keys) != len(set(bank_holiday_keys)):
         raise ValueError(
             f"Duplicate bank holiday records found in {academic_year}"
+        )
+
+    if len(bank_holiday_records) != 8:
+        raise ValueError(
+            f"Expected eight bank holidays in {academic_year}; "
+            f"found {len(bank_holiday_records)}"
         )
 
     # ------------------------------------ Periods Outside Terms -----------------------------------
