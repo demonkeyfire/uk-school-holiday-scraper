@@ -76,10 +76,9 @@ each available year (currently 2026/27 through 2029/30). Calendar dates take pre
 sources overlap, and webpage-only date portions are retained. The iCalendar's exclusive `DTEND`
 values are converted to inclusive school-date ranges.
 
-To extract the Bath & North East Somerset 2025/26 calendar PDF into the standard CSV schema, run
-`python -m scrapers.authorities.bath_north_east_somerset_pdf`. The script reads the PDF stored in
-`school_calendars/bath_north_east_somerset/` and writes a CSV beside it. Use `--pdf` or `--output`
-to provide alternate paths.
+The Bath & North East Somerset scraper follows the printable-calendar links on the council
+term-dates page and downloads the linked PDFs for PDF-backed academic years. PDF records take
+precedence over the overlapping webpage table records.
 
 Example:
 
