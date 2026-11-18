@@ -67,11 +67,9 @@ The project is currently developed and tested in Kaggle notebooks.
 3. Configure the source identifiers to run.
 4. Execute the main script or import the scraper modules into a notebook.
 
-The Buckinghamshire Excel calendar can be extracted separately by importing
-`scrape_buckinghamshire_calendar` from `scrapers.authorities.buckinghamshire_calendar`.
-It returns the standard output schema and reads the workbook stored in
-`school_calendars/buckinghamshire/` by default; this does not change the existing
-website scraper.
+The Buckinghamshire scraper follows the calendar download link on the council webpage and
+combines its detailed Excel calendar with the webpage dates. Calendar dates take precedence
+where the two sources overlap.
 
 Example:
 
