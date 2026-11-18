@@ -17,6 +17,7 @@ from scrapers.authorities.birmingham                        import scrape_birmin
 from scrapers.authorities.bournemouth_christchurch_poole    import scrape_bournemouth_christchurch_poole
 from scrapers.authorities.bradford                          import scrape_bradford
 from scrapers.authorities.northern_ireland                  import scrape_northern_ireland
+from scrapers.authorities.bristol                           import scrape_bristol
 
 
 
@@ -29,6 +30,7 @@ SCRAPERS = {"SRC001": scrape_aberdeenshire
            ,"SRC004": scrape_birmingham
            ,"SRC005": scrape_bournemouth_christchurch_poole
            ,"SRC006": scrape_bradford
+           ,"SRC007": scrape_bristol
            ,"SRC058": scrape_northern_ireland}
 
 # Define the columns returned by the authority scrapers.
