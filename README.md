@@ -76,6 +76,10 @@ each available year (currently 2026/27 through 2029/30). Calendar dates take pre
 sources overlap, and webpage-only date portions are retained. The iCalendar's exclusive `DTEND`
 values are converted to inclusive school-date ranges.
 
+The Central Bedfordshire scraper downloads the linked PDF calendars directly from the council
+webpage and extracts term periods, pupil holidays, bank holidays and available teacher-training
+days. The webpage records remain as a fallback if a linked PDF cannot be processed.
+
 The Bath & North East Somerset scraper follows the printable-calendar links on the council
 term-dates page and downloads the linked PDFs for PDF-backed academic years. PDF records take
 precedence over the overlapping webpage table records.
