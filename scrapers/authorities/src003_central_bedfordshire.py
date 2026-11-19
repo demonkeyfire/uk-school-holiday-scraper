@@ -2,7 +2,8 @@
 # -------------------------------------------- Overview --------------------------------------------
 
 # Retrieve Central Bedfordshire school-term and holiday events from the council webpage and linked
-# PDF calendars. PDF calendar information takes precedence when a calendar can be processed.
+# PDF calendars. PDF holiday dates take precedence; webpage term dates fill gaps when PDF dates fail
+# validation.
 
 
 
@@ -66,6 +67,7 @@ SLASH_TERM_RANGE_PATTERN = re.compile(
     r"(?P<start_day>\d{1,2})/(?P<start_month>\d{1,2})/(?P<start_year>\d{2,4})"
     r"\s*[–-]\s*"
     r"(?P<end_day>\d{1,2})/(?P<end_month>\d{1,2})/(?P<end_year>\d{2,4})"
+    r"(?:[ \t]+(?P<term_days>\d{1,3})\b)?"
 )
 
 NAMED_TERM_RANGE_PATTERN = re.compile(
@@ -231,6 +233,48 @@ def validate_term_periods(term_periods, academic_year):
             )
 
         previous_end = end_date
+
+
+def validate_term_range_day_counts(date_ranges, academic_year, school_holiday_dates,
+                                   bank_holiday_dates):
+
+    """Validate published term-day counts against weekdays in each date range."""
+
+    reported_day_counts = [
+        term_days
+        for _, _, term_days in date_ranges
+    ]
+
+    if not any(term_days is not None for term_days in reported_day_counts):
+        return
+
+    if any(term_days is None for term_days in reported_day_counts):
+        raise ValueError(
+            f"Missing a term day count for one or more date ranges in {academic_year}"
+        )
+
+    excluded_dates = school_holiday_dates | bank_holiday_dates
+
+    for start_date, end_date, expected_days in date_ranges:
+
+        actual_days = 0
+        current_date = start_date
+
+        while current_date <= end_date:
+
+            if (
+                current_date.weekday() < 5
+                and current_date not in excluded_dates
+            ):
+                actual_days += 1
+
+            current_date += timedelta(days=1)
+
+        if actual_days != expected_days:
+            raise ValueError(
+                f"Expected {expected_days} term weekdays in {academic_year} "
+                f"from {start_date} to {end_date}; found {actual_days}"
+            )
 
 
 def match_pdf_color(actual_color, expected_color, tolerance=PDF_COLOR_TOLERANCE):
@@ -561,6 +605,9 @@ def get_term_periods(calendar_text, academic_year, school_holiday_dates,
                 ,int(match.group("end_month"))
                 ,int(match.group("end_day"))
             )
+            ,int(match.group("term_days"))
+            if match.group("term_days") is not None
+            else None
         ))
 
     # ---------------------------------------- Named Date Ranges -----------------------------------
@@ -605,6 +652,7 @@ def get_term_periods(calendar_text, academic_year, school_holiday_dates,
                     ,end_month
                     ,int(match.group("end_day"))
                 )
+                ,None
             ))
 
     # -------------------------------------- Validate Date Ranges ----------------------------------
@@ -620,14 +668,21 @@ def get_term_periods(calendar_text, academic_year, school_holiday_dates,
         date_ranges.sort(key=lambda item: item[0])
 
         validate_academic_year_dates(
+            [(start_date, end_date) for start_date, end_date, _ in date_ranges]
+            ,academic_year
+        )
+
+        validate_term_range_day_counts(
             date_ranges
             ,academic_year
+            ,school_holiday_dates
+            ,bank_holiday_dates
         )
 
         # Check that the six ranges are chronologically ordered and do not overlap.
         previous_end = None
 
-        for start_date, end_date in date_ranges:
+        for start_date, end_date, _ in date_ranges:
 
             if previous_end is not None and start_date <= previous_end:
                 raise ValueError(
@@ -795,7 +850,7 @@ def group_school_holidays(school_holiday_dates, academic_year):
 
 def extract_pdf_calendar(pdf_url, academic_year, date_scraped):
 
-    """Download a council PDF and return its term, holiday and training-day records."""
+    """Download a council PDF and return its holiday records and any valid term records."""
 
     response = requests.get(
         make_direct_download_url(pdf_url)
@@ -817,13 +872,7 @@ def extract_pdf_calendar(pdf_url, academic_year, date_scraped):
             )
 
         page = calendar_pdf.pages[0]
-        calendar_text = page.extract_text()
-
-        if not calendar_text:
-            raise ValueError(
-                f"Could not extract text from the {academic_year} PDF"
-            )
-
+        calendar_text = page.extract_text() or ""
         event_dates = extract_calendar_event_dates(
             page
             ,academic_year
@@ -833,26 +882,42 @@ def extract_pdf_calendar(pdf_url, academic_year, date_scraped):
         bank_holiday_dates = event_dates.get("Bank Holiday", set())
         teacher_training_dates = event_dates.get("Teacher Training Day", set())
 
-        term_periods = get_term_periods(
-            calendar_text
-            ,academic_year
-            ,school_holiday_dates
-            ,bank_holiday_dates
-            ,teacher_training_dates
-        )
+        try:
+            if not calendar_text:
+                raise ValueError(
+                    f"Could not extract text from the {academic_year} PDF"
+                )
+
+            term_periods = get_term_periods(
+                calendar_text
+                ,academic_year
+                ,school_holiday_dates
+                ,bank_holiday_dates
+                ,teacher_training_dates
+            )
+
+        except ValueError as error:
+            print(
+                f"Could not extract PDF term dates for {academic_year}: "
+                f"{type(error).__name__}: {error}"
+            )
+            term_periods = None
 
     # ----------------------------------------- Term Records ---------------------------------------
 
-    records = [
-        make_record(
-            academic_year
-            ,event_name
-            ,start_date
-            ,end_date
-            ,date_scraped
+    records = []
+
+    if term_periods is not None:
+        records.extend(
+            make_record(
+                academic_year
+                ,event_name
+                ,start_date
+                ,end_date
+                ,date_scraped
+            )
+            for event_name, start_date, end_date in term_periods
         )
-        for event_name, start_date, end_date in term_periods
-    ]
 
     # -------------------------------------- Bank Holiday Records ----------------------------------
 
@@ -896,9 +961,12 @@ def extract_pdf_calendar(pdf_url, academic_year, date_scraped):
         )
     )
 
-    return pd.DataFrame.from_records(
-        records
-        ,columns=OUTPUT_COLUMNS + ["_START_DATE"]
+    return (
+        pd.DataFrame.from_records(
+            records
+            ,columns=OUTPUT_COLUMNS + ["_START_DATE"]
+        )
+        ,term_periods is not None
     )
 
 
@@ -980,6 +1048,15 @@ def extract_webpage_records(soup, date_scraped):
     return records
 
 
+def is_webpage_term_boundary_record(record):
+
+    """Identify term start/end records to retain when PDF term dates are invalid."""
+
+    event_name = record["EVENT_NAME"].lower()
+
+    return event_name.startswith(("term starts", "term ends"))
+
+
 
 # ------------------------------------------- Main Code --------------------------------------------
 
@@ -988,8 +1065,8 @@ def scrape_central_bedfordshire():
     """
     Retrieve school-term and holiday events from Central Bedfordshire Council.
 
-    PDF calendars take precedence for academic years whose linked PDFs can be processed.
-    Webpage records are retained as a fallback for other years.
+    PDF holiday dates take precedence. Webpage term records fill gaps when PDF term dates fail
+    validation, and all webpage records are retained when a PDF cannot be processed.
     """
 
     # -------------------------------------- Retrieve Webpage --------------------------------------
@@ -1027,11 +1104,12 @@ def scrape_central_bedfordshire():
 
     pdf_records = []
     processed_academic_years = set()
+    pdf_term_academic_years = set()
 
     for academic_year, pdf_url in find_pdf_calendar_links(soup, source_url):
 
         try:
-            pdf_data = extract_pdf_calendar(
+            pdf_data, has_pdf_term_records = extract_pdf_calendar(
                 pdf_url
                 ,academic_year
                 ,date_scraped
@@ -1054,14 +1132,24 @@ def scrape_central_bedfordshire():
             continue
 
         processed_academic_years.add(academic_year)
+
+        if has_pdf_term_records:
+            pdf_term_academic_years.add(academic_year)
+
         pdf_records.append(pdf_data)
 
     # ----------------------------------------- Combine Data ---------------------------------------
 
-    # Retain webpage records only where a PDF was not successfully processed.
+    # Use webpage term boundaries when PDF events were extracted but its term dates were invalid.
     combined_records = [
         record for record in webpage_records
-        if record["ACADEMIC_YEAR"] not in processed_academic_years
+        if (
+            record["ACADEMIC_YEAR"] not in processed_academic_years
+            or (
+                record["ACADEMIC_YEAR"] not in pdf_term_academic_years
+                and is_webpage_term_boundary_record(record)
+            )
+        )
     ]
 
     # Add the successfully extracted PDF records.
@@ -1108,8 +1196,10 @@ def scrape_central_bedfordshire():
         webpage_academic_years | processed_academic_years
     ):
 
-        if academic_year in processed_academic_years:
+        if academic_year in pdf_term_academic_years:
             extraction_source = "PDF"
+        elif academic_year in processed_academic_years:
+            extraction_source = "PDF holidays + webpage terms"
         elif academic_year in webpage_academic_years:
             extraction_source = "Webpage fallback"
         else:
