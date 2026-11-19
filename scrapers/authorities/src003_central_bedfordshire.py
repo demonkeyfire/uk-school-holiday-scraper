@@ -653,9 +653,6 @@ def get_term_periods(calendar_text, academic_year, school_holiday_dates,
 
     print(f"  Extracted term periods for {academic_year}:")
 
-    for term_name, start_date, end_date in term_periods:
-        print(f"    {term_name}: {start_date} to {end_date}")
-
         validate_term_periods(
             term_records
             ,academic_year
