@@ -110,17 +110,19 @@ PDF_EVENT_COLORS = {
         (0.635, 0.949, 0.941): "Transition Days",
     },
     "2027/28": {
-        (0.518, 0.886, 0.565): "School Holiday",
-        (0.898, 0.62, 0.863): "Bank Holiday",
-        (0.918, 0.196, 0.78): "Inset Day",
-        (0.278, 0.831, 0.349): "Transition Days",
+        (0.514, 0.792, 0.922): "School Holiday",
+        (0.278, 0.831, 0.349): "Bank Holiday",
+        (0.898, 0.62, 0.863): "Inset Day",
+        (0.918, 0.196, 0.78): "Transition Days",
     },
 }
 
 PDF_TERM_COLORS = {
     "2026/27": (0.706, 0.776, 0.906),
-    "2027/28": (0.514, 0.792, 0.922),
+    "2027/28": 1.0,
 }
+
+PDF_UNFILLED_TERM_YEARS = {"2027/28"}
 
 
 
@@ -687,9 +689,11 @@ def identify_pdf_event_color(actual_color, academic_year):
         if match_pdf_event_color(actual_color, expected_color):
             return event_name
 
-    if match_pdf_event_color(
+    term_color = PDF_TERM_COLORS.get(academic_year)
+
+    if term_color is not None and match_pdf_event_color(
         actual_color
-        ,PDF_TERM_COLORS[academic_year]
+        ,term_color
     ):
         return "Term Day"
 
@@ -698,9 +702,29 @@ def identify_pdf_event_color(actual_color, academic_year):
 
 def find_pdf_month_groups(page, academic_year):
 
-    """Identify and validate the 12 month headings in the PDF calendar."""
+    """Identify and validate the month headings on a PDF calendar page."""
 
     month_headers = []
+    weekday_words = [
+        word for word in page.extract_words()
+        if word["text"] in {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"}
+    ]
+
+    weekday_rows = []
+
+    for word in sorted(weekday_words, key=lambda item: item["top"]):
+
+        if (
+            not weekday_rows
+            or abs(word["top"] - weekday_rows[-1][0]["top"]) > 5
+        ):
+            weekday_rows.append([word])
+
+        else:
+            weekday_rows[-1].append(word)
+
+    if not any(len(row) >= 28 for row in weekday_rows):
+        return []
 
     for word in page.extract_words():
 
@@ -744,9 +768,14 @@ def find_pdf_month_groups(page, academic_year):
     for group in month_groups:
         group.sort(key=lambda item: item["X"])
 
+    calendar_month_groups = [
+        group for group in month_groups
+        if len(group) == 4
+    ]
+
     ordered_months = [
         header["MONTH"]
-        for group in month_groups
+        for group in calendar_month_groups
         for header in group
     ]
 
@@ -762,12 +791,7 @@ def find_pdf_month_groups(page, academic_year):
             f"{ordered_months}"
         )
 
-    if any(len(group) != 4 for group in month_groups):
-        raise ValueError(
-            f"Expected four month headings per PDF row for {academic_year}"
-        )
-
-    return month_groups
+    return calendar_month_groups
 
 
 def find_pdf_month_for_date(word_center_x, word_center_y, month_groups):
@@ -821,6 +845,7 @@ def find_pdf_date_event(word_center_x, word_center_y, page, academic_year):
     """Find the smallest recognised coloured rectangle containing a date number."""
 
     matching_rectangles = []
+    has_colored_rectangle = False
 
     for rectangle in page.rects:
 
@@ -829,6 +854,9 @@ def find_pdf_date_event(word_center_x, word_center_y, page, academic_year):
             and rectangle["top"] <= word_center_y <= rectangle["bottom"]
         ):
             continue
+
+        if rectangle.get("non_stroking_color") is not None:
+            has_colored_rectangle = True
 
         event_name = identify_pdf_event_color(
             rectangle.get("non_stroking_color")
@@ -846,6 +874,12 @@ def find_pdf_date_event(word_center_x, word_center_y, page, academic_year):
         matching_rectangles.append((area, event_name))
 
     if not matching_rectangles:
+        if (
+            academic_year in PDF_UNFILLED_TERM_YEARS
+            and not has_colored_rectangle
+        ):
+            return "Term Day"
+
         return None
 
     matching_rectangles.sort(key=lambda item: item[0])
@@ -889,6 +923,9 @@ def extract_pdf_calendar(pdf_content, academic_year, date_scraped):
                 page
                 ,academic_year
             )
+
+            if not month_groups:
+                continue
 
             for word in page.extract_words():
 
@@ -935,52 +972,6 @@ def extract_pdf_calendar(pdf_content, academic_year, date_scraped):
 
                 category_dates[event_name].add(calendar_date)
                 recognised_date_cells += 1
-
-        for word in page.extract_words():
-
-            if not re.fullmatch(r"\d{1,2}", word["text"]):
-                continue
-
-            day_number = int(word["text"])
-
-            if not 1 <= day_number <= 31:
-                continue
-
-            word_center_x = (word["x0"] + word["x1"]) / 2
-            word_center_y = (word["top"] + word["bottom"]) / 2
-
-            month_header = find_pdf_month_for_date(
-                word_center_x
-                ,word_center_y
-                ,month_groups
-            )
-
-            if month_header is None:
-                continue
-
-            try:
-                calendar_date = date(
-                    month_header["YEAR"]
-                    ,month_header["NUMBER"]
-                    ,day_number
-                )
-
-            except ValueError:
-                continue
-
-            event_name = find_pdf_date_event(
-                word_center_x
-                ,word_center_y
-                ,page
-                ,academic_year
-            )
-
-            if event_name is None:
-                unclassified_date_cells += 1
-                continue
-
-            category_dates[event_name].add(calendar_date)
-            recognised_date_cells += 1
 
     validate_category_dates(
         category_dates
