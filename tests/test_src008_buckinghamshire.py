@@ -54,6 +54,36 @@ class BuckinghamshirePdfTests(unittest.TestCase):
                 all(record["ACADEMIC_YEAR"] == academic_year for record in records)
             )
 
+    def test_2026_27_weekend_cells_are_not_school_holidays(self):
+        records = scraper.extract_pdf_calendar(
+            (
+                PDF_DIRECTORY
+                / "School_Term_Dates_2026_to_2027_PDF.pdf"
+            ).read_bytes()
+            ,"2026/27"
+            ,date.today()
+        )
+        school_holidays = [
+            record for record in records
+            if record["EVENT_NAME"] == "School Holiday"
+        ]
+
+        self.assertTrue(school_holidays)
+
+        for record in school_holidays:
+            for match in scraper.DATE_PATTERN.finditer(record["RAW_DATE_TEXT"]):
+                holiday_date = date(
+                    int(match.group(3))
+                    ,scraper.MONTH_NUMBERS[match.group(2).title()]
+                    ,int(match.group(1))
+                )
+
+                self.assertLess(
+                    holiday_date.weekday()
+                    ,5
+                    ,record["RAW_DATE_TEXT"]
+                )
+
     def test_scraper_uses_pdf_responses_for_future_years(self):
         source_url = "https://council.example/school-dates"
         webpage = f"""

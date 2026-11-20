@@ -104,7 +104,7 @@ PDF_COLOR_TOLERANCE = 0.02
 
 PDF_EVENT_COLORS = {
     "2026/27": {
-        (1.0, 0.902, 0.6): "School Holiday",
+        (0.706, 0.776, 0.906): "School Holiday",
         (0.408, 0.478, 0.988): "Bank Holiday",
         (1.0, 1.0, 0.0): "Inset Day",
         (0.635, 0.949, 0.941): "Transition Days",
@@ -118,7 +118,7 @@ PDF_EVENT_COLORS = {
 }
 
 PDF_TERM_COLORS = {
-    "2026/27": (0.706, 0.776, 0.906),
+    "2026/27": (0.776, 0.878, 0.706),
     "2027/28": 1.0,
 }
 
@@ -808,6 +808,15 @@ def find_pdf_month_for_date(word_center_x, word_center_y, month_groups):
         return None
 
     month_row = preceding_rows[-1]
+
+    if month_row is month_groups[-1]:
+        row_spacings = [
+            current[0]["TOP"] - previous[0]["TOP"]
+            for previous, current in zip(month_groups, month_groups[1:])
+        ]
+
+        if word_center_y > month_row[0]["TOP"] + min(row_spacings):
+            return None
 
     # Derive horizontal column boundaries from adjacent month-heading centres.
     boundaries = []
