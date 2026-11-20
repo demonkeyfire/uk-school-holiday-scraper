@@ -476,7 +476,7 @@ def subtract_calendar_coverage(start_date, end_date, coverage):
 
 def validate_category_dates(category_dates, academic_year, description):
 
-    """Check for dates assigned to multiple mutually exclusive categories."""
+    """Validate category dates, allowing inset days to overlap term days."""
 
     date_categories = defaultdict(set)
 
@@ -491,15 +491,20 @@ def validate_category_dates(category_dates, academic_year, description):
         for calendar_date in dates:
             date_categories[calendar_date].add(event_name)
 
-    conflicting_dates = {
-        calendar_date: sorted(categories)
-        for calendar_date, categories in date_categories.items()
-        if len(categories) > 1
-    }
+    conflicting_dates = {}
+
+    for calendar_date, categories in date_categories.items():
+
+        # Inset days can legitimately occur within term periods.
+        if categories == {"Inset Day", "Term Day"}:
+            continue
+
+        if len(categories) > 1:
+            conflicting_dates[calendar_date] = sorted(categories)
 
     if conflicting_dates:
         raise ValueError(
-            f"{description} contains dates assigned to multiple categories: "
+            f"{description} contains dates assigned to conflicting categories: "
             f"{conflicting_dates}"
         )
 
@@ -872,27 +877,64 @@ def extract_pdf_calendar(pdf_content, academic_year, date_scraped):
 
     with pdfplumber.open(BytesIO(pdf_content)) as calendar_pdf:
 
-        if not calendar_pdf.pages:
-            raise ValueError(
-                f"The PDF for {academic_year} contains no pages"
-            )
-
-        if len(calendar_pdf.pages) != 1:
-            raise ValueError(
-                f"Expected a one-page PDF for {academic_year}; "
-                f"found {len(calendar_pdf.pages)} pages"
-            )
-
-        page = calendar_pdf.pages[0]
-
-        month_groups = find_pdf_month_groups(
-            page
-            ,academic_year
-        )
-
         category_dates = defaultdict(set)
         recognised_date_cells = 0
         unclassified_date_cells = 0
+
+        for page_number, page in enumerate(calendar_pdf.pages, start=1):
+
+            print(f"  Processing PDF page {page_number}")
+
+            month_groups = find_pdf_month_groups(
+                page
+                ,academic_year
+            )
+
+            for word in page.extract_words():
+
+                if not re.fullmatch(r"\d{1,2}", word["text"]):
+                    continue
+
+                day_number = int(word["text"])
+
+                if not 1 <= day_number <= 31:
+                    continue
+
+                word_center_x = (word["x0"] + word["x1"]) / 2
+                word_center_y = (word["top"] + word["bottom"]) / 2
+
+                month_header = find_pdf_month_for_date(
+                    word_center_x
+                    ,word_center_y
+                    ,month_groups
+                )
+
+                if month_header is None:
+                    continue
+
+                try:
+                    calendar_date = date(
+                        month_header["YEAR"]
+                        ,month_header["NUMBER"]
+                        ,day_number
+                    )
+
+                except ValueError:
+                    continue
+
+                event_name = find_pdf_date_event(
+                    word_center_x
+                    ,word_center_y
+                    ,page
+                    ,academic_year
+                )
+
+                if event_name is None:
+                    unclassified_date_cells += 1
+                    continue
+
+                category_dates[event_name].add(calendar_date)
+                recognised_date_cells += 1
 
         for word in page.extract_words():
 
