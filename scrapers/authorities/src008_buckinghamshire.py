@@ -17,6 +17,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from openpyxl import load_workbook
+import pdfplumber
 
 from scrapers.source_config import get_source
 
@@ -37,6 +38,24 @@ OUTPUT_COLUMNS = ["SOURCE_ID"
 
 TERM_PATTERN = re.compile(r"(Autumn|Spring|Summer)\s+term\s+(\d{4})", re.IGNORECASE)
 CALENDAR_LINK_PATTERN = re.compile(re.escape(CALENDAR_FILENAME) + r"(?:\?|$)", re.IGNORECASE)
+PDF_LINK_YEAR_PATTERN = re.compile(
+    r"(20\d{2})[\s_-]*(?:to|/|-|_)[\s_-]*(20\d{2})",
+    re.IGNORECASE
+)
+PDF_EVENT_COLORS = {
+    "2026/27": {
+        (1.0, 0.902, 0.6): "School Holiday",
+        (0.408, 0.478, 0.988): "Bank Holiday",
+        (1.0, 1.0, 0.0): "Inset Day",
+        (0.635, 0.949, 0.941): "Transition Day",
+    },
+    "2027/28": {
+        (0.518, 0.886, 0.565): "School Holiday",
+        (0.898, 0.62, 0.863): "Bank Holiday",
+        (0.918, 0.196, 0.78): "Inset Day",
+        (0.278, 0.831, 0.349): "Transition Day",
+    },
+}
 DATE_PATTERN = re.compile(
     r"\b(?:(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s+)?"
     r"(\d{1,2})\s+"
@@ -316,6 +335,182 @@ def extract_calendar_records(workbook_content, date_scraped):
     return records
 
 
+def find_pdf_calendar_links(soup, page_url):
+
+    """Return academic-year and PDF URL pairs linked from the council page."""
+
+    calendar_links = {}
+
+    for link in soup.find_all("a", href=True):
+
+        link_text = " ".join((
+            link.get_text(" ", strip=True)
+            ,str(link.get("title", ""))
+        ))
+        href = str(link["href"])
+
+        year_match = PDF_LINK_YEAR_PATTERN.search(link_text)
+
+        if year_match is None:
+            year_match = PDF_LINK_YEAR_PATTERN.search(href)
+
+        if year_match is None:
+            continue
+
+        start_year = int(year_match.group(1))
+        end_year = int(year_match.group(2))
+        academic_year = f"{start_year}/{str(end_year)[-2:]}"
+
+        if academic_year not in ("2026/27", "2027/28"):
+            continue
+
+        pdf_url = urljoin(page_url, href)
+
+        if academic_year in calendar_links and calendar_links[academic_year] != pdf_url:
+            raise ValueError(f"Multiple different PDF links found for {academic_year}")
+
+        calendar_links[academic_year] = pdf_url
+
+    return list(calendar_links.items())
+
+
+def match_pdf_event_color(actual_color, expected_color, tolerance=0.02):
+
+    """Compare PDF fill colors with a small tolerance."""
+
+    if isinstance(actual_color, (int, float)) and isinstance(expected_color, (int, float)):
+        return abs(float(actual_color) - float(expected_color)) <= tolerance
+
+    if isinstance(expected_color, (int, float)):
+        return False
+
+    if not isinstance(actual_color, (tuple, list)) or len(actual_color) != 3:
+        return False
+
+    return all(
+        abs(float(actual) - float(expected)) <= tolerance
+        for actual, expected in zip(actual_color, expected_color)
+    )
+
+
+def extract_pdf_calendar(pdf_content, academic_year, date_scraped):
+
+    """Extract color-coded calendar dates from a Buckinghamshire PDF."""
+
+    event_colors = PDF_EVENT_COLORS.get(academic_year)
+
+    if event_colors is None:
+        raise ValueError(f"No PDF calendar color mapping is configured for {academic_year}")
+
+    # The Term Day colors differ from the holiday categories and are stable per PDF layout.
+    term_colors = {
+        "2026/27": (0.706, 0.776, 0.906),
+        "2027/28": (0.514, 0.792, 0.922),
+    }
+
+    with pdfplumber.open(BytesIO(pdf_content)) as calendar_pdf:
+        if not calendar_pdf.pages:
+            raise ValueError(f"The PDF for {academic_year} contains no pages")
+
+        page = calendar_pdf.pages[0]
+        month_headers = []
+
+        for word in page.extract_words():
+            month_name = word["text"].title()
+            month_number = MONTH_NUMBERS.get(month_name)
+
+            if month_number is None:
+                continue
+
+            year_start = int(academic_year[:4])
+            year = year_start if month_number >= 9 else year_start + 1
+            month_headers.append({
+                "MONTH": month_name,
+                "NUMBER": month_number,
+                "YEAR": year,
+                "X": (word["x0"] + word["x1"]) / 2,
+                "TOP": word["top"],
+            })
+
+        month_groups = []
+
+        for header in sorted(month_headers, key=lambda item: item["TOP"]):
+            if not month_groups or abs(header["TOP"] - month_groups[-1][0]["TOP"]) > 5:
+                month_groups.append([header])
+            else:
+                month_groups[-1].append(header)
+
+        category_dates = defaultdict(set)
+
+        for word in page.extract_words():
+            if not re.fullmatch(r"\d{1,2}", word["text"]):
+                continue
+
+            word_center_x = (word["x0"] + word["x1"]) / 2
+            word_center_y = (word["top"] + word["bottom"]) / 2
+
+            month_row = [
+                group for group in month_groups
+                if group[0]["TOP"] <= word_center_y
+            ]
+
+            if not month_row:
+                continue
+
+            month_header = min(
+                month_row[-1],
+                key=lambda item: abs(item["X"] - word_center_x)
+            )
+
+            try:
+                calendar_date = date(
+                    month_header["YEAR"]
+                    ,month_header["NUMBER"]
+                    ,int(word["text"])
+                )
+            except ValueError:
+                continue
+
+            for rectangle in page.rects:
+                if not (
+                    rectangle["x0"] <= word_center_x <= rectangle["x1"]
+                    and rectangle["top"] <= word_center_y <= rectangle["bottom"]
+                ):
+                    continue
+
+                actual_color = rectangle.get("non_stroking_color")
+
+                event_name = next((
+                    name for color, name in event_colors.items()
+                    if match_pdf_event_color(actual_color, color)
+                ), None)
+
+                if event_name is None:
+                    if match_pdf_event_color(actual_color, term_colors[academic_year]):
+                        event_name = "Term Day"
+
+                if event_name is not None:
+                    category_dates[event_name].add(calendar_date)
+
+                break
+
+    records = []
+
+    for event_name, dates in category_dates.items():
+        for period_start, period_end in consolidate_dates(sorted(dates)):
+            records.append({
+                "SOURCE_ID": SOURCE_ID
+                ,"ACADEMIC_YEAR": academic_year
+                ,"EVENT_NAME": event_name
+                ,"RAW_DATE_TEXT": format_date_range(period_start, period_end)
+                ,"DATE_SCRAPED": date_scraped
+                ,"_START_DATE": period_start
+                ,"_END_DATE": period_end
+            })
+
+    return records
+
+
 
 # ------------------------------------------- Main Code --------------------------------------------
 
@@ -402,6 +597,34 @@ def scrape_buckinghamshire():
                                     ,timeout = 30)
     calendar_response.raise_for_status()
     calendar_records = extract_calendar_records(calendar_response.content, date_scraped)
+    pdf_calendar_records = []
+
+    for academic_year, pdf_url in find_pdf_calendar_links(soup, source_url):
+
+        try:
+            pdf_response = requests.get(pdf_url
+                                       ,headers = HEADERS
+                                       ,timeout = 30)
+            pdf_response.raise_for_status()
+
+            if not pdf_response.content.startswith(b"%PDF-"):
+                raise ValueError(
+                    f"The council link for {academic_year} did not return a PDF file"
+                )
+
+            pdf_calendar_records.extend(
+                extract_pdf_calendar(pdf_response.content
+                                    ,academic_year
+                                    ,date_scraped)
+            )
+
+        except Exception as error:
+            print(
+                f"Could not extract PDF for {academic_year}: "
+                f"{type(error).__name__}: {error}"
+            )
+
+    calendar_records.extend(pdf_calendar_records)
     calendar_coverage = merge_calendar_coverage(calendar_records)
     resolved_website_records = []
 
