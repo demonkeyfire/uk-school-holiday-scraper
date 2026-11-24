@@ -16,11 +16,16 @@
 from collections import defaultdict
 from datetime import date, datetime, timedelta, timezone
 from io import BytesIO
+import re
+from urllib.parse import urljoin
 
 import pandas as pd
 import requests
+from bs4 import BeautifulSoup
 from docx import Document
 from docx.oxml.ns import qn
+
+from scrapers.source_config import get_source_url
 
 
 
@@ -29,9 +34,10 @@ from docx.oxml.ns import qn
 SOURCE_ID = "SRC006"
 HEADERS = {"User-Agent": "SchoolHolidayResearch/1.0"}
 
-DOCUMENT_URLS = {"2025/26": "https://bso.bradford.gov.uk/userfiles/file/IMT/SchoolHolidays/Bradford%20Term%20Dates%202025-26.docx"
-                ,"2026/27": "https://bso.bradford.gov.uk/userfiles/file/IMT/Bradford%20Term%20Dates%202026-27.docx"
-                ,"2027/28": "https://bso.bradford.gov.uk/userfiles/file/IMT/SchoolHolidays/Bradford%20Term%20Dates%202027-28.docx"}
+ACADEMIC_YEARS = ("2025/26", "2026/27", "2027/28")
+ACADEMIC_YEAR_PATTERN = re.compile(
+    r"\b(?P<start_year>20\d{2})\s*(?:/|-)\s*(?P<end_year>\d{2,4})\b"
+)
 
 OUTPUT_COLUMNS = ["SOURCE_ID"
                  ,"ACADEMIC_YEAR"
@@ -126,15 +132,75 @@ def consolidate_dates(dates):
     return periods
 
 
+def find_document_urls(soup, source_url):
+
+    """Find the council's Word calendar URL for each supported academic year."""
+
+    document_urls = {}
+
+    for anchor in soup.find_all("a", href=True):
+        href = anchor["href"]
+
+        if not href.split("?", 1)[0].lower().endswith(".docx"):
+            continue
+
+        link_text = anchor.get_text(" ", strip=True)
+        match = ACADEMIC_YEAR_PATTERN.search(f"{link_text} {href}")
+
+        if match is None:
+            continue
+
+        start_year = int(match.group("start_year"))
+        end_year_text = match.group("end_year")
+        end_year = (
+            int(end_year_text)
+            if len(end_year_text) == 4
+            else (start_year // 100) * 100 + int(end_year_text)
+        )
+
+        if end_year != start_year + 1:
+            continue
+
+        academic_year = f"{start_year}/{end_year % 100:02d}"
+
+        if academic_year in ACADEMIC_YEARS:
+            document_urls.setdefault(
+                academic_year
+                ,urljoin(source_url, href)
+            )
+
+    missing_years = set(ACADEMIC_YEARS) - set(document_urls)
+
+    if missing_years:
+        raise ValueError(
+            f"Missing Bradford Word calendars: {', '.join(sorted(missing_years))}"
+        )
+
+    return document_urls
+
+
 
 # ------------------------------------------- Main Code --------------------------------------------
 
 def scrape_bradford():
 
+    source_url = get_source_url(SOURCE_ID)
+    page_response = requests.get(
+        source_url
+        ,headers=HEADERS
+        ,timeout=30
+    )
+    page_response.raise_for_status()
+    document_urls = find_document_urls(
+        BeautifulSoup(page_response.content, "html.parser")
+        ,source_url
+    )
+
     records = []
     date_scraped = datetime.now(timezone.utc).date()
 
-    for academic_year, document_url in DOCUMENT_URLS.items():
+    for academic_year in ACADEMIC_YEARS:
+        document_url = document_urls[academic_year]
 
         response = requests.get(document_url
                                ,headers = HEADERS

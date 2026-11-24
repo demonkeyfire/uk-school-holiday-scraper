@@ -85,8 +85,8 @@ class CentralBedfordshirePdfTests(unittest.TestCase):
         with (
             patch.object(
                 scraper
-                ,"get_source"
-                ,return_value={"SOURCE_URL": source_url}
+                ,"get_source_url"
+                ,return_value=source_url
             )
             ,patch.object(
                 scraper.requests

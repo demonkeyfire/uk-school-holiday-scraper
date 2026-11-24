@@ -27,11 +27,15 @@ The scraper produces a tabular dataset with the following fields:
 | --------------- | ----------------------------------------------------------------------- |
 | `SOURCE_ID`     | Unique identifier for the source, linked to the source register.        |
 | `ACADEMIC_YEAR` | Academic year associated with the event, where identifiable.            |
+| `AUTHORITY`     | Local authority for sources that publish dates for multiple authorities.|
 | `EVENT_NAME`    | Name or description of the school holiday or term-date event.           |
 | `RAW_DATE_TEXT` | Date information as published by the source, before date normalisation. |
 | `DATE_SCRAPED`  | Date on which the source was scraped, in `YYYY-MM-DD` format.           |
 
 Raw date text is retained to preserve the original published information and support subsequent date parsing and validation.
+The Welsh Government scraper includes an `AUTHORITY` value because its pages publish dates for all Welsh local authorities under the single source ID `SRC209`.
+Every registered scraper selects its URL from `SOURCE_STATUS`: `ACTIVE` uses `SOURCE_URL`, `ALTERNATIVE` uses `SOURCE_URL_ALT`, and `BLOCKED` sources are skipped and reported as blocked by the runner.
+Cardiff uses the status-selected `SRC010` URL; if that page is unavailable or incomplete, its scraper fills missing academic years from `SRC209` and retains the source ID for each year's data.
 
 ## Project Structure
 
@@ -97,7 +101,7 @@ The repository URL and execution instructions should be updated as the project s
 
 ## Source Coverage
 
-Sources are maintained in a separate source register. Each source is assigned a unique `SOURCE_ID`, allowing the extracted dataset to be joined back to the source metadata.
+Sources are maintained in a separate source register. Each source is assigned a unique `SOURCE_ID`, allowing the extracted dataset to be joined back to the source metadata. The `SOURCE_STATUS` field controls whether a scraper uses the primary URL, an alternative URL, or skips the source.
 
 Not all sources necessarily use the same publishing format. The framework is intended to accommodate different source types, including HTML tables, structured HTML content and downloadable documents, as support is implemented and tested.
 

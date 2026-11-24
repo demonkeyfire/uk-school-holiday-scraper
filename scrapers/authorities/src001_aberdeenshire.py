@@ -16,7 +16,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from scrapers.source_config import get_source
+from scrapers.source_config import get_source_url
 
 
 
@@ -360,8 +360,7 @@ def scrape_aberdeenshire():
             DATE_SCRAPED
     """
 
-    source = get_source(SOURCE_ID)
-    source_url = source["SOURCE_URL"]
+    source_url = get_source_url(SOURCE_ID)
 
     response = requests.get(source_url
                            ,headers = HEADERS

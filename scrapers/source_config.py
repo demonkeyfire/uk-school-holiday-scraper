@@ -11,6 +11,16 @@
 import pandas as pd
 
 
+class SourceBlockedError(RuntimeError):
+
+    """Raised when a source is marked BLOCKED in the source register."""
+
+
+class SourceConfigurationError(RuntimeError):
+
+    """Raised when a source status or its corresponding URL is invalid."""
+
+
 
 # --------------------------------------------- Input ----------------------------------------------
 
@@ -69,3 +79,39 @@ def get_source(source_id):
         raise ValueError(f"Unknown SOURCE_ID: {source_id}")
 
     return source.iloc[0]
+
+
+# Select the URL that is permitted by the source's status in the central register.
+def get_source_url(source_id):
+
+    """
+    Return the URL selected by SOURCE_STATUS for a given source.
+
+    ACTIVE sources use SOURCE_URL, ALTERNATIVE sources use SOURCE_URL_ALT, and BLOCKED sources
+    raise SourceBlockedError so callers can skip scraping without making a request.
+    """
+
+    source = get_source(source_id)
+    status = str(source["SOURCE_STATUS"]).strip().upper()
+
+    if status == "BLOCKED":
+        raise SourceBlockedError(f"{source_id} is marked BLOCKED in {SOURCES_PATH}")
+
+    url_column = {
+        "ACTIVE": "SOURCE_URL"
+        ,"ALTERNATIVE": "SOURCE_URL_ALT"
+    }.get(status)
+
+    if url_column is None:
+        raise SourceConfigurationError(
+            f"Unsupported SOURCE_STATUS {status!r} for {source_id}"
+        )
+
+    source_url = source[url_column]
+
+    if pd.isna(source_url) or not str(source_url).strip():
+        raise SourceConfigurationError(
+            f"{source_id} has no URL in {url_column} for SOURCE_STATUS {status}"
+        )
+
+    return str(source_url).strip()

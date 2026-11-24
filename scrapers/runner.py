@@ -19,7 +19,10 @@ from scrapers.authorities.src006_bradford                       import scrape_br
 from scrapers.authorities.src007_bristol                        import scrape_bristol
 from scrapers.authorities.src008_buckinghamshire                import scrape_buckinghamshire
 from scrapers.authorities.src009_cambridgeshire                 import scrape_cambridgeshire
+from scrapers.authorities.src010_cardiff                        import scrape_cardiff
 from scrapers.authorities.src058_northern_ireland               import scrape_northern_ireland
+from scrapers.authorities.src209_wales                           import scrape_wales
+from scrapers.source_config                                     import SourceBlockedError, get_source_url
 
 
 
@@ -35,11 +38,14 @@ SCRAPERS = {"SRC001": scrape_aberdeenshire
            ,"SRC007": scrape_bristol
            ,"SRC008": scrape_buckinghamshire
            ,"SRC009": scrape_cambridgeshire
-           ,"SRC058": scrape_northern_ireland}
+           ,"SRC010": scrape_cardiff
+           ,"SRC058": scrape_northern_ireland
+           ,"SRC209": scrape_wales}
 
 # Define the columns returned by the authority scrapers.
 OUTPUT_COLUMNS = ["SOURCE_ID"
                  ,"ACADEMIC_YEAR"
+                 ,"AUTHORITY"
                  ,"EVENT_NAME"
                  ,"RAW_DATE_TEXT"
                  ,"DATE_SCRAPED"]
@@ -84,6 +90,7 @@ def run_scrapers(source_ids = None):
             continue
 
         try:
+            get_source_url(source_id)
             data = SCRAPERS[source_id]()
 
             records.append(data)
@@ -92,6 +99,12 @@ def run_scrapers(source_ids = None):
                            ,"STATUS"    : "SUCCESS"
                            ,"RECORDS"   : len(data)
                            ,"ERROR"     : None})
+
+        except SourceBlockedError as error:
+            results.append({"SOURCE_ID" : source_id
+                           ,"STATUS"    : "BLOCKED"
+                           ,"RECORDS"   : 0
+                           ,"ERROR"     : str(error)})
 
         except Exception as error:
             results.append({"SOURCE_ID" : source_id
