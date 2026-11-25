@@ -16,6 +16,11 @@ class SourceBlockedError(RuntimeError):
     """Raised when a source is marked BLOCKED in the source register."""
 
 
+class SourceNoDataError(RuntimeError):
+
+    """Raised when a source does not publish authority-wide dates to scrape."""
+
+
 class SourceConfigurationError(RuntimeError):
 
     """Raised when a source status or its corresponding URL is invalid."""
@@ -87,8 +92,8 @@ def get_source_url(source_id):
     """
     Return the URL selected by SOURCE_STATUS for a given source.
 
-    ACTIVE sources use SOURCE_URL, ALTERNATIVE sources use SOURCE_URL_ALT, and BLOCKED sources
-    raise SourceBlockedError so callers can skip scraping without making a request.
+    ACTIVE sources use SOURCE_URL, ALTERNATIVE sources use SOURCE_URL_ALT, and BLOCKED or NO_DATA
+    sources raise their corresponding exceptions so callers can skip scraping without a request.
     """
 
     source = get_source(source_id)
@@ -96,6 +101,9 @@ def get_source_url(source_id):
 
     if status == "BLOCKED":
         raise SourceBlockedError(f"{source_id} is marked BLOCKED in {SOURCES_PATH}")
+
+    if status == "NO_DATA":
+        raise SourceNoDataError(f"{source_id} is marked NO_DATA in {SOURCES_PATH}")
 
     url_column = {
         "ACTIVE": "SOURCE_URL"
