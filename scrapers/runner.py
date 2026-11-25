@@ -21,8 +21,8 @@ from scrapers.authorities.src008_buckinghamshire                import scrape_bu
 from scrapers.authorities.src009_cambridgeshire                 import scrape_cambridgeshire
 from scrapers.authorities.src010_cardiff                        import scrape_cardiff
 from scrapers.authorities.src058_northern_ireland               import scrape_northern_ireland
-from scrapers.authorities.src209_wales                           import scrape_wales
-from scrapers.source_config                                     import SourceBlockedError, get_source_url
+from scrapers.authorities.src209_wales                          import scrape_wales
+from scrapers.source_config                                     import SourceBlockedError, SourceNoDataError, get_source_url
 
 
 
@@ -103,6 +103,12 @@ def run_scrapers(source_ids = None):
         except SourceBlockedError as error:
             results.append({"SOURCE_ID" : source_id
                            ,"STATUS"    : "BLOCKED"
+                           ,"RECORDS"   : 0
+                           ,"ERROR"     : str(error)})
+
+        except SourceNoDataError as error:
+            results.append({"SOURCE_ID" : source_id
+                           ,"STATUS"    : "NO_DATA"
                            ,"RECORDS"   : 0
                            ,"ERROR"     : str(error)})
 
