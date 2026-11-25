@@ -40,7 +40,7 @@ SCRAPERS = {"SRC001": scrape_aberdeenshire
            ,"SRC008": scrape_buckinghamshire
            ,"SRC009": scrape_cambridgeshire
            ,"SRC010": scrape_cardiff
-           ,"SRC010": scrape_cheshire_west_and_chester
+           ,"SRC011": scrape_cheshire_west_and_chester
            ,"SRC058": scrape_northern_ireland
            ,"SRC209": scrape_wales}
 
