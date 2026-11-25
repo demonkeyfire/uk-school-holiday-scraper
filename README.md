@@ -34,7 +34,7 @@ The scraper produces a tabular dataset with the following fields:
 
 Raw date text is retained to preserve the original published information and support subsequent date parsing and validation.
 The Welsh Government scraper includes an `AUTHORITY` value because its pages publish dates for all Welsh local authorities under the single source ID `SRC209`.
-Every registered scraper selects its URL from `SOURCE_STATUS`: `ACTIVE` uses `SOURCE_URL`, `ALTERNATIVE` uses `SOURCE_URL_ALT`, and `BLOCKED` sources are skipped and reported as blocked by the runner.
+Every registered scraper selects its URL from `SOURCE_STATUS`: `ACTIVE` uses `SOURCE_URL`, `ALTERNATIVE` uses `SOURCE_URL_ALT`, and `BLOCKED` or `NO_DATA` sources are skipped and reported by the runner. Use `NO_DATA` when an accessible source does not publish authority-wide dates; use `BLOCKED` for access restrictions.
 Cardiff uses the status-selected `SRC010` URL; if that page is unavailable or incomplete, its scraper fills missing academic years from `SRC209` and retains the source ID for each year's data.
 
 ## Project Structure
