@@ -73,7 +73,8 @@ def run_scrapers(source_ids = None):
     Returns
     -------
     tuple
-        A combined DataFrame and a summary DataFrame containing the outcome of each scraper.
+        A combined DataFrame and a summary DataFrame containing the outcome of each scraper,
+        broken down by academic year.
     """
 
     # Default to running all registered scrapers when no source IDs are supplied.
@@ -87,48 +88,90 @@ def run_scrapers(source_ids = None):
     for source_id in source_ids:
 
         if source_id not in SCRAPERS:
-            results.append({"SOURCE_ID" : source_id
-                           ,"STATUS"    : "NOT REGISTERED"
-                           ,"RECORDS"   : 0
-                           ,"ERROR"     : "No scraper registered for this SOURCE_ID"})
+            results.append({
+                "SOURCE_ID": source_id,
+                "ACADEMIC_YEAR": None,
+                "STATUS": "NOT REGISTERED",
+                "RECORDS": 0,
+                "ERROR": "No scraper registered for this SOURCE_ID"
+            })
             continue
 
         try:
             get_source_url(source_id)
             data = SCRAPERS[source_id]()
 
+            # Retain the returned data, including empty DataFrames.
             records.append(data)
 
-            results.append({"SOURCE_ID" : source_id
-                           ,"STATUS"    : "SUCCESS"
-                           ,"RECORDS"   : len(data)
-                           ,"ERROR"     : None})
+            # Create one summary row for each academic year returned by the scraper.
+            if not data.empty and "ACADEMIC_YEAR" in data.columns:
+
+                year_summary = (
+                    data.groupby("ACADEMIC_YEAR", dropna=False)
+                        .size()
+                        .reset_index(name="RECORDS")
+                )
+
+                for _, row in year_summary.iterrows():
+                    results.append({
+                        "SOURCE_ID": source_id,
+                        "ACADEMIC_YEAR": row["ACADEMIC_YEAR"],
+                        "STATUS": "SUCCESS",
+                        "RECORDS": int(row["RECORDS"]),
+                        "ERROR": None
+                    })
+
+            else:
+                results.append({
+                    "SOURCE_ID": source_id,
+                    "ACADEMIC_YEAR": None,
+                    "STATUS": "NO_DATA",
+                    "RECORDS": 0,
+                    "ERROR": "Scraper returned no records"
+                })
 
         except SourceBlockedError as error:
-            results.append({"SOURCE_ID" : source_id
-                           ,"STATUS"    : "BLOCKED"
-                           ,"RECORDS"   : 0
-                           ,"ERROR"     : str(error)})
+            results.append({
+                "SOURCE_ID": source_id,
+                "ACADEMIC_YEAR": None,
+                "STATUS": "BLOCKED",
+                "RECORDS": 0,
+                "ERROR": str(error)
+            })
 
         except SourceNoDataError as error:
-            results.append({"SOURCE_ID" : source_id
-                           ,"STATUS"    : "NO_DATA"
-                           ,"RECORDS"   : 0
-                           ,"ERROR"     : str(error)})
+            results.append({
+                "SOURCE_ID": source_id,
+                "ACADEMIC_YEAR": None,
+                "STATUS": "NO_DATA",
+                "RECORDS": 0,
+                "ERROR": str(error)
+            })
 
         except Exception as error:
-            results.append({"SOURCE_ID" : source_id
-                           ,"STATUS"    : "FAILED"
-                           ,"RECORDS"   : 0
-                           ,"ERROR"     : str(error)})
+            results.append({
+                "SOURCE_ID": source_id,
+                "ACADEMIC_YEAR": None,
+                "STATUS": "FAILED",
+                "RECORDS": 0,
+                "ERROR": str(error)
+            })
 
     # Combine successful scraper outputs into a single DataFrame.
     if records:
-        combined = pd.concat(records
-                             ,ignore_index = True)
+        combined = pd.concat(records, ignore_index=True)
     else:
-        combined = pd.DataFrame(columns = OUTPUT_COLUMNS)
+        combined = pd.DataFrame(columns=OUTPUT_COLUMNS)
 
+    # Build the academic-year summary.
     summary = pd.DataFrame.from_records(results)
+
+    # Sort by SOURCE_ID and academic year.
+    if not summary.empty:
+        summary = summary.sort_values(
+            ["SOURCE_ID", "ACADEMIC_YEAR"],
+            na_position="last"
+        ).reset_index(drop=True)
 
     return combined, summary
