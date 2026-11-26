@@ -1,7 +1,9 @@
+
 # -------------------------------------------- Overview --------------------------------------------
 
 # Test all configured authority URLs and identify those blocked by Cloudflare.
 # Results are classified by HTTP status and Cloudflare-specific response indicators.
+# Includes functionality to update URL_RESPONSE in the source configuration.
 
 
 # --------------------------------------------- Imports --------------------------------------------
@@ -11,6 +13,7 @@ import requests
 import pandas as pd
 
 from pathlib import Path
+from tqdm.auto import tqdm
 
 
 # --------------------------------------------- Settings -------------------------------------------
@@ -24,7 +27,10 @@ HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/130.0.0.0 Safari/537.36"
     ),
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept": (
+        "text/html,application/xhtml+xml,application/xml;"
+        "q=0.9,*/*;q=0.8"
+    ),
     "Accept-Language": "en-GB,en;q=0.9",
 }
 
@@ -50,8 +56,13 @@ def check_source_urls():
 
     results = []
 
-    # Check each configured URL independently.
-    for _, source in sources.iterrows():
+    # Check each configured URL independently, displaying progress.
+    for _, source in tqdm(
+        sources.iterrows(),
+        total=len(sources),
+        desc="Checking authority URLs",
+        unit="URL"
+    ):
 
         source_id = source["SOURCE_ID"]
         authority = source["AUTHORITY_NAME"]
@@ -78,7 +89,7 @@ def check_source_urls():
                 allow_redirects=True
             )
 
-            # Examine the response headers and page content for Cloudflare indicators.
+            # Examine response headers and page content for Cloudflare indicators.
             response_headers = {
                 key.lower(): value.lower()
                 for key, value in response.headers.items()
@@ -130,8 +141,6 @@ def check_source_urls():
                 "DETAIL": detail,
             })
 
-            print(f"{source_id} | {authority} | {response.status_code} | {result}")
-
         except requests.exceptions.Timeout:
 
             results.append({
@@ -174,3 +183,46 @@ def check_source_urls():
     )
 
     return results_df, blocked_df
+
+
+# -------------------------------------- Update Source Configuration --------------------------------
+
+def update_source_config(results_df):
+
+    # Load the existing source configuration.
+    sources = pd.read_csv(SOURCE_FILE)
+
+    # Update URL_RESPONSE using the diagnostic results.
+    for _, result in results_df.iterrows():
+
+        mask = sources["SOURCE_ID"] == result["SOURCE_ID"]
+
+        if mask.any():
+            sources.loc[mask, "URL_RESPONSE"] = result["RESULT"]
+
+    # Save the updated source configuration.
+    sources.to_csv(SOURCE_FILE, index=False)
+
+    return sources
+
+
+# --------------------------------------------- Run ------------------------------------------------
+
+if __name__ == "__main__":
+
+    results, cloudflare_blocked = check_source_urls()
+
+    print("\n---------------------------------------------")
+    print("CLOUDFLARE BLOCKED SOURCES")
+    print("---------------------------------------------")
+
+    display(cloudflare_blocked)
+
+    print(f"\nTotal URLs checked: {len(results)}")
+    print(f"Cloudflare blocked: {len(cloudflare_blocked)}")
+    print(
+        "Other HTTP 403 responses:",
+        (results["RESULT"] == "HTTP_403_UNCONFIRMED").sum()
+    )
+
+    print(f"\nResults saved to: {OUTPUT_FILE}")
