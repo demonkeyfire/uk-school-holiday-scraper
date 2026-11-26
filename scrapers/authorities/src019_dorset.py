@@ -23,7 +23,17 @@ from scrapers.source_config import get_source
 SOURCE_ID = "SRC019"
 
 HEADERS = {
-    "User-Agent": "SchoolHolidayResearch/1.0"
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/130.0.0.0 Safari/537.36"
+    ),
+    "Accept": (
+        "text/html,application/xhtml+xml,application/xml;"
+        "q=0.9,image/avif,image/webp,*/*;q=0.8"
+    ),
+    "Accept-Language": "en-GB,en;q=0.9",
+    "Referer": "https://www.google.com/",
 }
 
 OUTPUT_COLUMNS = [
