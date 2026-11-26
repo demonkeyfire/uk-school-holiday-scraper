@@ -50,7 +50,7 @@ def scrape_dundee():
 
     date_scraped = datetime.now().strftime("%Y-%m-%d")
 
-    # Process headings, accordion titles and list items in their original page order
+    # Process page elements in their original order
     elements = main_content.find_all(
         ["dt", "h1", "h2", "h3", "h4", "p", "li"]
     )
@@ -62,41 +62,32 @@ def scrape_dundee():
         if not text:
             continue
 
-        # Identify academic year headings, e.g. Academic Year 2026-27
+        # Identify academic year wherever it appears in the page content
         year_match = re.search(
-            r"Academic Year\s+(20\d{2})\s*[-/]\s*(\d{4}|\d{2})",
+            r"Academic Year\s+(20\d{2})\s*[-/]\s*(\d{2}|\d{4})",
             text,
             re.IGNORECASE
         )
 
-        if not year_match and element.name in ["dt", "h1", "h2", "h3", "h4"]:
-            year_match = re.search(
-                r"\b(20\d{2})\s*[-/]\s*(\d{4}|\d{2})\b",
-                text,
-                re.IGNORECASE
-            )
-
-        if year_match and element.name in ["dt", "h1", "h2", "h3", "h4"]:
+        if year_match:
 
             start_year = int(year_match.group(1))
             end_year_text = year_match.group(2)
-            end_year = (
-                int(end_year_text)
-                if len(end_year_text) == 4
-                else int(f"{start_year // 100}{end_year_text}")
-            )
 
-            if end_year != start_year + 1:
-                academic_year = None
+            if len(end_year_text) == 2:
+                end_year = int(
+                    f"{start_year // 100}{end_year_text}"
+                )
+            else:
+                end_year = int(end_year_text)
+
+            if end_year == start_year + 1:
+                academic_year = f"{start_year}/{str(end_year)[-2:]}"
                 section = None
-                continue
-
-            academic_year = f"{start_year}/{str(end_year)[-2:]}"
-            section = None
 
             continue
 
-        # Identify the current term or holiday section
+        # Identify term and holiday sections
         if element.name in ["dt", "h1", "h2", "h3", "h4", "p"]:
 
             section_match = re.match(
@@ -108,15 +99,14 @@ def scrape_dundee():
 
             if section_match:
                 section = section_match.group(1).title()
-            elif element.name in ["h1", "h2", "h3", "h4", "dt", "p"]:
-                section = None
 
             continue
 
+        # Only extract dated list items
         if element.name != "li" or academic_year is None:
             continue
 
-        # Split the published date from the event description.
+        # Split the date from the event description
         date_match = re.match(
             r"^(?P<date>.+?)\s*[-–]\s*(?P<event>.+)$",
             text
@@ -157,5 +147,12 @@ def scrape_dundee():
     ]
 
     df = pd.DataFrame(records, columns=output_columns)
+
+    # Raise an informative error if the page was retrieved but no events were found
+    if df.empty:
+        raise ValueError(
+            "Dundee page was retrieved successfully, but no dated list items "
+            "were extracted. Check the page's HTML structure."
+        )
 
     return df
