@@ -60,6 +60,12 @@ def scrape_dorset():
         headers=HEADERS,
         timeout=30
     )
+
+    print("Status:", response.status_code)
+    print("Final URL:", response.url)
+    print("Content type:", response.headers.get("Content-Type"))
+    print(response.text[:500])
+
     response.raise_for_status()
 
     soup = BeautifulSoup(response.content, "html.parser")
