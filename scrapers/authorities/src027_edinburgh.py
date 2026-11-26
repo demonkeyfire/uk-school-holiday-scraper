@@ -2,7 +2,7 @@
 # -------------------------------------------- Overview --------------------------------------------
 
 # Retrieve school term dates and holidays for the City of Edinburgh Council.
-# The source publishes each academic year on a separate page.
+# The source publishes each academic year on a separate paginated page.
 # The scraper follows the academic-year links and returns one row per event,
 # retaining the original date wording and page order.
 
@@ -107,11 +107,9 @@ def extract_event_text(text, date_match):
     before_date = text[:date_match.start()].strip()
     after_date = text[date_match.end():].strip()
 
-    # Remove punctuation surrounding the remaining text
     before_date = before_date.strip(" ,.-")
     after_date = after_date.strip(" ,.-")
 
-    # Remove trailing punctuation and non-descriptive qualifiers
     after_date = re.sub(
         r"\s+inclusive\.?$",
         "",
@@ -140,6 +138,7 @@ def scrape_edinburgh():
     records = []
     pages_to_visit = [start_url]
     visited_urls = set()
+    academic_years_found = set()
 
     while pages_to_visit:
 
@@ -168,6 +167,8 @@ def scrape_edinburgh():
 
         if academic_year is None:
             continue
+
+        academic_years_found.add(academic_year)
 
         # Extract events in their original page order
         elements = main_content.find_all(
@@ -228,14 +229,14 @@ def scrape_edinburgh():
             })
 
         # Find links to other academic-year pages.
-        # Search the entire HTML document rather than only main_content,
-        # as the council's pagination links may sit outside that element.
+        # Search the entire HTML document because pagination links
+        # may sit outside the main content element.
 
         for link in soup.find_all("a", href=True):
 
             link_text = link.get_text(" ", strip=True)
 
-            # Edinburgh pagination links contain the academic year in their text
+            # Identify links containing an academic-year reference
             year_match = re.search(
                 r"20\d{2}\s*/\s*\d{2}",
                 link_text
@@ -251,7 +252,10 @@ def scrape_edinburgh():
             next_url = urljoin(final_url, link["href"])
             next_url = urldefrag(next_url).url
 
-            if next_url not in visited_urls and next_url not in pages_to_visit:
+            if (
+                next_url not in visited_urls
+                and next_url not in pages_to_visit
+            ):
                 pages_to_visit.append(next_url)
 
     # Create dataframe using the standard project output schema
@@ -266,10 +270,26 @@ def scrape_edinburgh():
 
     df = pd.DataFrame(records, columns=output_columns)
 
+    # Check that all three expected academic years were retrieved
+    expected_years = {
+        "2026/27",
+        "2027/28",
+        "2028/29"
+    }
+
+    missing_years = expected_years - academic_years_found
+
+    if missing_years:
+        raise ValueError(
+            f"Edinburgh scraper did not retrieve all expected academic years. "
+            f"Found: {sorted(academic_years_found)}. "
+            f"Missing: {sorted(missing_years)}. "
+            f"Pages visited: {sorted(visited_urls)}"
+        )
+
     if df.empty:
         raise ValueError(
-            "Edinburgh page was retrieved successfully, but no dated events "
-            "were extracted. Check the page's HTML structure and date formats."
+            "Edinburgh pages were retrieved, but no dated events were extracted."
         )
 
     return df
