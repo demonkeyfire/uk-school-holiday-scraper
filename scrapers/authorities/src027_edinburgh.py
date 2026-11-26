@@ -46,6 +46,8 @@ def get_page(url, session):
 def get_academic_year(text):
     """Extract academic year from page text."""
 
+    text = text.replace("\xa0", " ")
+
     match = re.search(
         r"School term dates\s+(20\d{2})\s*/\s*(\d{2})",
         text,
@@ -161,9 +163,31 @@ def scrape_edinburgh():
 
         main_content = soup.find("main") or soup
 
-        # Identify the academic year from the page heading
-        page_heading = main_content.get_text(" ", strip=True)
-        academic_year = get_academic_year(page_heading)
+        # Identify the academic year from the dedicated page heading.
+        # The page navigation also contains all academic-year links, so using
+        # the whole main-content text would incorrectly select 2026/27.
+        academic_year_heading = None
+
+        for candidate in main_content.find_all(["h1", "h2"]):
+            candidate_text = candidate.get_text(" ", strip=True)
+
+            if get_academic_year(candidate_text) is not None:
+                academic_year_heading = candidate
+                break
+
+        if academic_year_heading is None:
+            for candidate in soup.find_all(["h1", "h2"]):
+                candidate_text = candidate.get_text(" ", strip=True)
+
+                if get_academic_year(candidate_text) is not None:
+                    academic_year_heading = candidate
+                    break
+
+        if academic_year_heading is None:
+            academic_year = None
+        else:
+            page_heading = academic_year_heading.get_text(" ", strip=True)
+            academic_year = get_academic_year(page_heading)
 
         if academic_year is None:
             continue
