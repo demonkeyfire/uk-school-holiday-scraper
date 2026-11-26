@@ -227,30 +227,29 @@ def scrape_edinburgh():
                 "DATE_SCRAPED": date_scraped,
             })
 
-        # Find links to other academic-year pages
-        for link in main_content.find_all("a", href=True):
+        # Find links to other academic-year pages.
+        # Search the entire HTML document rather than only main_content,
+        # as the council's pagination links may sit outside that element.
+
+        for link in soup.find_all("a", href=True):
 
             link_text = link.get_text(" ", strip=True)
-            link_url = urljoin(final_url, link["href"])
 
-            # Look for an academic-year reference in either the link text or URL
+            # Edinburgh pagination links contain the academic year in their text
             year_match = re.search(
-                r"\b20\d{2}\s*/\s*\d{2}\b",
-                f"{link_text} {link_url}"
+                r"20\d{2}\s*/\s*\d{2}",
+                link_text
             )
 
             if not year_match:
                 continue
 
-            # Only follow links that appear to relate to school term dates
-            if not re.search(
-                r"term|date|holiday",
-                f"{link_text} {link_url}",
-                re.IGNORECASE
-            ):
+            # Only follow links explicitly referring to school term dates
+            if "school term dates" not in link_text.lower():
                 continue
 
-            next_url = urldefrag(link_url).url
+            next_url = urljoin(final_url, link["href"])
+            next_url = urldefrag(next_url).url
 
             if next_url not in visited_urls and next_url not in pages_to_visit:
                 pages_to_visit.append(next_url)
