@@ -15,7 +15,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from scrapers.source_config import get_source
+from scrapers.source_config import get_source_url
 
 
 SOURCE_ID = "SRC021"
@@ -25,9 +25,8 @@ SOURCE_ID = "SRC021"
 
 def scrape_dundee():
 
-    # Retrieve source URL from central configuration
-    source = get_source(SOURCE_ID)
-    url = source["SOURCE_URL"]
+    # Retrieve the URL selected for the source's current status
+    url = get_source_url(SOURCE_ID)
 
     headers = {
         "User-Agent": "SchoolHolidayResearch/1.0"
@@ -51,9 +50,9 @@ def scrape_dundee():
 
     date_scraped = datetime.now().strftime("%Y-%m-%d")
 
-    # Process headings and list items in their original page order
+    # Process headings, accordion titles and list items in their original page order
     elements = main_content.find_all(
-        ["h1", "h2", "h3", "h4", "li"]
+        ["dt", "h1", "h2", "h3", "h4", "p", "li"]
     )
 
     for element in elements:
@@ -65,23 +64,40 @@ def scrape_dundee():
 
         # Identify academic year headings, e.g. Academic Year 2026-27
         year_match = re.search(
-            r"Academic Year\s+(20\d{2})\s*[-/]\s*(\d{2})",
+            r"Academic Year\s+(20\d{2})\s*[-/]\s*(\d{4}|\d{2})",
             text,
             re.IGNORECASE
         )
 
-        if year_match and element.name in ["h1", "h2", "h3", "h4"]:
+        if not year_match and element.name in ["dt", "h1", "h2", "h3", "h4"]:
+            year_match = re.search(
+                r"\b(20\d{2})\s*[-/]\s*(\d{4}|\d{2})\b",
+                text,
+                re.IGNORECASE
+            )
+
+        if year_match and element.name in ["dt", "h1", "h2", "h3", "h4"]:
 
             start_year = int(year_match.group(1))
-            end_year = year_match.group(2)
+            end_year_text = year_match.group(2)
+            end_year = (
+                int(end_year_text)
+                if len(end_year_text) == 4
+                else int(f"{start_year // 100}{end_year_text}")
+            )
 
-            academic_year = f"{start_year}/{end_year}"
+            if end_year != start_year + 1:
+                academic_year = None
+                section = None
+                continue
+
+            academic_year = f"{start_year}/{str(end_year)[-2:]}"
             section = None
 
             continue
 
         # Identify the current term or holiday section
-        if element.name in ["h1", "h2", "h3", "h4"]:
+        if element.name in ["dt", "h1", "h2", "h3", "h4", "p"]:
 
             section_match = re.match(
                 r"^(Autumn Term|Autumn Holiday|Winter Term|"
@@ -91,7 +107,9 @@ def scrape_dundee():
             )
 
             if section_match:
-                section = section_match.group(1)
+                section = section_match.group(1).title()
+            elif element.name in ["h1", "h2", "h3", "h4", "dt", "p"]:
+                section = None
 
             continue
 
@@ -99,10 +117,8 @@ def scrape_dundee():
             continue
 
         # Split the published date from the event description.
-        # The date includes the four-digit year, allowing the delimiter
-        # to be identified even where the source omits spaces around it.
         date_match = re.match(
-            r"^(?P<date>.*?\b20\d{2})\s*-\s*(?P<event>.+)$",
+            r"^(?P<date>.+?)\s*[-–]\s*(?P<event>.+)$",
             text
         )
 
