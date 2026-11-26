@@ -24,6 +24,7 @@ from scrapers.authorities.src011_cheshire_west_and_chester      import scrape_ch
 from scrapers.authorities.src017_devon                          import scrape_devon
 from scrapers.authorities.src020_dudley                         import scrape_dudley
 from scrapers.authorities.src021_dundee                         import scrape_dundee
+from scrapers.authorities.src027_edinburgh                      import scrape_edinburgh
 from scrapers.authorities.src058_northern_ireland               import scrape_northern_ireland
 from scrapers.authorities.src209_wales                          import scrape_wales
 from scrapers.source_config                                     import SourceBlockedError, SourceNoDataError, get_source_url
@@ -47,6 +48,7 @@ SCRAPERS = {"SRC001": scrape_aberdeenshire
            ,"SRC017": scrape_devon
            ,"SRC020": scrape_dudley
            ,"SRC021": scrape_dundee
+           ,"SRC027": scrape_edinburgh
            ,"SRC058": scrape_northern_ireland
            ,"SRC209": scrape_wales}
 
