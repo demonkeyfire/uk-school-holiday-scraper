@@ -1,12 +1,12 @@
 
 # -------------------------------------------- Overview --------------------------------------------
 
-# Retrieve school term dates from Knowsley Council.
-# The output is one row per published term or half-term event and academic year,
-# retaining the source's original date wording and page order.
+# Retrieve school term and half-term dates from Knowsley Council.
+# The output is one row per published event and academic year.
+# Original date wording is retained in RAW_DATE_TEXT.
 #
-# The council publishes term dates and half terms, but does not separately
-# identify the longer school holiday periods.
+# The page presents dates as text rows separated by a vertical bar,
+# rather than using HTML tables.
 
 
 # --------------------------------------------- Input ----------------------------------------------
@@ -16,7 +16,7 @@ from datetime import date
 
 import pandas as pd
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 from scrapers.source_config import get_source_url
 
@@ -59,20 +59,23 @@ def normalise_academic_year(text):
 
 
 def is_academic_year_heading(tag):
-    """Identify headings containing a school-year label."""
+    """Identify headings containing an academic-year label."""
 
     if tag.name not in ["h2", "h3", "h4"]:
         return False
 
-    return normalise_academic_year(tag.get_text(" ", strip=True)) is not None
+    return normalise_academic_year(
+        tag.get_text(" ", strip=True)
+    ) is not None
 
 
 def validate_date_range(date_text):
-    """Check that the published text contains two written dates."""
+    """Check that the text contains two written dates."""
 
     date_pattern = (
         r"(?:"
-        r"(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)"
+        r"(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
+        r"Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)"
         r"\s+"
         r")?"
         r"\d{1,2}(?:st|nd|rd|th)?\s+"
@@ -92,40 +95,53 @@ def validate_date_range(date_text):
         )
 
 
-def extract_table_events(table, academic_year):
-    """Extract event rows from a term dates table."""
+def is_date_row(tag):
+    """Identify a leaf-level HTML element containing a pipe-separated row."""
 
-    events = []
+    if tag.name not in ["p", "div", "li", "tr"]:
+        return False
 
-    for row in table.find_all("tr"):
-        cells = row.find_all(["td", "th"], recursive=False)
+    text = tag.get_text(" ", strip=True)
 
-        # Ignore header rows and incomplete rows.
-        if len(cells) < 2 or any(cell.name == "th" for cell in cells):
-            continue
+    if "|" not in text:
+        return False
 
-        event_name = cells[0].get_text(" ", strip=True)
-        date_text = cells[1].get_text(" ", strip=True)
+    # Avoid extracting the same row from parent containers.
+    for child in tag.find_all(["p", "div", "li", "tr"]):
+        if "|" in child.get_text(" ", strip=True):
+            return False
 
-        if not event_name or not date_text:
-            continue
+    return True
 
-        validate_date_range(date_text)
 
-        events.append({
-            "SOURCE_ID": SOURCE_ID,
-            "ACADEMIC_YEAR": academic_year,
-            "AUTHORITY": AUTHORITY,
-            "EVENT_NAME": event_name,
-            "RAW_DATE_TEXT": date_text,
-            "DATE_SCRAPED": date.today().isoformat(),
-        })
+def extract_event_row(text, academic_year):
+    """Split a published row into event name and date wording."""
 
-    return events
+    parts = text.split("|", maxsplit=1)
+
+    if len(parts) != 2:
+        return None
+
+    event_name = parts[0].strip()
+    date_text = parts[1].strip()
+
+    if not event_name or not date_text:
+        return None
+
+    validate_date_range(date_text)
+
+    return {
+        "SOURCE_ID": SOURCE_ID,
+        "ACADEMIC_YEAR": academic_year,
+        "AUTHORITY": AUTHORITY,
+        "EVENT_NAME": event_name,
+        "RAW_DATE_TEXT": date_text,
+        "DATE_SCRAPED": date.today().isoformat(),
+    }
 
 
 def scrape_knowsley():
-    """Scrape Knowsley school term dates."""
+    """Scrape Knowsley school term and half-term dates."""
 
     url = get_source_url(SOURCE_ID)
 
@@ -139,46 +155,42 @@ def scrape_knowsley():
     soup = BeautifulSoup(response.content, "html.parser")
 
     events = []
-    headings = soup.find_all(is_academic_year_heading)
+    current_year = None
 
-    if not headings:
-        raise ValueError(
-            "Could not identify any academic-year headings on the page."
+    # Process page elements in document order.
+    for element in soup.find_all(
+        ["h2", "h3", "h4", "p", "div", "li", "tr"]
+    ):
+
+        if is_academic_year_heading(element):
+            current_year = normalise_academic_year(
+                element.get_text(" ", strip=True)
+            )
+            continue
+
+        if current_year is None:
+            continue
+
+        if not is_date_row(element):
+            continue
+
+        event = extract_event_row(
+            element.get_text(" ", strip=True),
+            current_year
         )
 
-    for heading in headings:
+        if event is not None:
+            events.append(event)
 
-        heading_text = heading.get_text(" ", strip=True)
-        academic_year = normalise_academic_year(heading_text)
+    if not events:
+        raise ValueError(
+            "No term date rows were extracted from the page."
+        )
 
-        # Find the next table belonging to this academic-year heading.
-        table = heading.find_next("table")
-
-        if table is None:
-            raise ValueError(
-                f"No term dates table found for {academic_year}."
-            )
-
-        # Check that the table occurs before the next academic-year heading.
-        next_heading = heading.find_next(is_academic_year_heading)
-
-        if next_heading is not None:
-            next_table = next_heading.find_previous("table")
-
-            if next_table == table:
-                # The table belongs to the current heading.
-                pass
-
-        year_events = extract_table_events(table, academic_year)
-
-        if not year_events:
-            raise ValueError(
-                f"No events extracted for academic year {academic_year}."
-            )
-
-        events.extend(year_events)
-
-    results = pd.DataFrame(events, columns=OUTPUT_COLUMNS)
+    results = pd.DataFrame(
+        events,
+        columns=OUTPUT_COLUMNS
+    )
 
     # Check for duplicate events.
     duplicate_columns = [
@@ -188,7 +200,7 @@ def scrape_knowsley():
     ]
 
     if results.duplicated(subset=duplicate_columns).any():
-        raise ValueError("Duplicate events detected in the extracted data.")
+        raise ValueError("Duplicate events detected.")
 
     return results
 
@@ -200,6 +212,7 @@ if __name__ == "__main__":
     results = scrape_knowsley()
 
     print(f"Records extracted: {len(results)}")
+
     print(
         results.groupby("ACADEMIC_YEAR")
         .size()
