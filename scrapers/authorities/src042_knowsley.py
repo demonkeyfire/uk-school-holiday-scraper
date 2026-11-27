@@ -91,36 +91,6 @@ def validate_date_range(date_text):
         )
 
 
-def extract_row_text(text_node):
-    """
-    Find the smallest parent element containing the complete
-    pipe-separated event and date text.
-    """
-
-    parent = text_node.parent
-
-    while parent is not None and parent.name != "[document]":
-
-        text = parent.get_text(" ", strip=True)
-
-        if "|" in text:
-            parts = text.split("|", maxsplit=1)
-
-            if len(parts) == 2:
-                event_name = parts[0].strip()
-                date_text = parts[1].strip()
-
-                try:
-                    validate_date_range(date_text)
-                    return event_name, date_text
-                except ValueError:
-                    pass
-
-        parent = parent.parent
-
-    return None
-
-
 def scrape_knowsley():
     """Scrape Knowsley school term and half-term dates."""
 
@@ -136,33 +106,33 @@ def scrape_knowsley():
     soup = BeautifulSoup(response.content, "html.parser")
 
     events = []
-    date_nodes = soup.find_all(
-        string=re.compile(r"\|")
-    )
+    academic_year = None
 
-    for text_node in date_nodes:
+    for element in soup.find_all(["h2", "h3", "h4", "tr"]):
 
-        # Find the nearest preceding academic-year heading.
-        heading = text_node.find_previous(
-            ["h2", "h3", "h4"]
-        )
-
-        if heading is None or not is_academic_year_heading(heading):
+        if element.name != "tr":
+            if is_academic_year_heading(element):
+                academic_year = normalise_academic_year(
+                    element.get_text(" ", strip=True)
+                )
             continue
 
-        academic_year = normalise_academic_year(
-            heading.get_text(" ", strip=True)
-        )
-
-        extracted = extract_row_text(text_node)
-
-        if extracted is None:
+        if academic_year is None:
             continue
 
-        event_name, date_text = extracted
+        event_cell = element.find("th")
+        date_cell = element.find("td")
+
+        if event_cell is None or date_cell is None:
+            continue
+
+        event_name = event_cell.get_text(" ", strip=True)
+        date_text = date_cell.get_text(" ", strip=True)
 
         if not event_name or not date_text:
             continue
+
+        validate_date_range(date_text)
 
         events.append({
             "SOURCE_ID": SOURCE_ID,
