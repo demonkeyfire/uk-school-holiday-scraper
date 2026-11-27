@@ -2,7 +2,8 @@
 # -------------------------------------------- Overview --------------------------------------------
 
 # Retrieve school term and holiday framework dates from Lancashire County Council.
-# The output is one row per published date event and academic year.
+#
+# The output is one row per published event and academic year.
 #
 # Events include:
 #   - Term starts
@@ -10,7 +11,9 @@
 #   - Term ends
 #   - May Day
 #
-# The original published date wording is retained in RAW_DATE_TEXT.
+# Each labelled event is extracted separately.
+# Original published date wording is retained in RAW_DATE_TEXT.
+#
 # Individual school INSET days are not included because schools choose these
 # independently.
 
@@ -64,36 +67,8 @@ def normalise_academic_year(text):
     return f"{start_year}/{str(end_year)[-2:]}"
 
 
-def is_academic_year_heading(tag):
-    """Identify academic-year headings."""
-
-    if tag.name not in ["h2", "h3", "h4"]:
-        return False
-
-    return normalise_academic_year(
-        tag.get_text(" ", strip=True)
-    ) is not None
-
-
-def is_term_heading(tag):
-    """Identify headings such as Autumn Term 2026."""
-
-    if tag.name not in ["h2", "h3", "h4"]:
-        return False
-
-    text = tag.get_text(" ", strip=True)
-
-    return bool(
-        re.search(
-            r"\b(?:Autumn|Spring|Summer)\s+Term\b",
-            text,
-            flags=re.IGNORECASE
-        )
-    )
-
-
 def parse_event_line(text, term_name):
-    """Extract an event label and its original date wording."""
+    """Extract one event label and its associated date wording."""
 
     text = re.sub(r"\s+", " ", text).strip()
 
@@ -114,9 +89,9 @@ def parse_event_line(text, term_name):
 
     date_text = match.group(2).strip()
 
-    # Remove minor wording variations without altering the date itself.
+    # Remove 'on' from the beginning of the date text.
     date_text = re.sub(
-        r"^(?:on\s+)",
+        r"^on\s+",
         "",
         date_text,
         flags=re.IGNORECASE
@@ -125,22 +100,24 @@ def parse_event_line(text, term_name):
     if not date_text:
         return None
 
-    # Require at least one complete written date.
-    date_pattern = (
-        r"(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)"
-        r"\s+"
-        r"\d{1,2}(?:st|nd|rd|th)?\s+"
-        r"[A-Za-z]+\s+20\d{2}"
-    )
-
-    if not re.search(date_pattern, date_text, flags=re.IGNORECASE):
-        raise ValueError(
-            f"Could not identify a complete date in: {date_text}"
-        )
-
     event_name = f"{term_name} - {event_type}"
 
     return event_name, date_text
+
+
+def is_term_heading(element):
+    """Identify headings such as Autumn Term 2025."""
+
+    if element.name not in ["h2", "h3", "h4"]:
+        return False
+
+    return bool(
+        re.search(
+            r"\b(?:Autumn|Spring|Summer)\s+Term\b",
+            element.get_text(" ", strip=True),
+            flags=re.IGNORECASE
+        )
+    )
 
 
 def scrape_lancashire():
@@ -162,29 +139,30 @@ def scrape_lancashire():
     current_year = None
     current_term = None
 
-    # Process headings and text blocks in document order.
+    # Process individual HTML elements in document order.
     for element in soup.find_all(
         ["h2", "h3", "h4", "p", "li"]
     ):
 
+        text = element.get_text(" ", strip=True)
+
         # Academic-year heading.
-        if is_academic_year_heading(element):
-            current_year = normalise_academic_year(
-                element.get_text(" ", strip=True)
-            )
+        academic_year = normalise_academic_year(text)
+
+        if academic_year:
+            current_year = academic_year
             current_term = None
             continue
 
         # Term heading.
         if is_term_heading(element):
-            current_term = element.get_text(" ", strip=True)
+            current_term = text
             continue
 
         if current_year is None or current_term is None:
             continue
 
-        text = element.get_text(" ", strip=True)
-
+        # Extract one event from this individual element.
         parsed = parse_event_line(text, current_term)
 
         if parsed is None:
@@ -204,7 +182,7 @@ def scrape_lancashire():
     if not events:
         raise ValueError(
             "No term date events extracted. "
-            "Check the page headings and date text structure."
+            "Check the page HTML structure."
         )
 
     results = pd.DataFrame(
@@ -212,7 +190,7 @@ def scrape_lancashire():
         columns=OUTPUT_COLUMNS
     )
 
-    # Remove duplicate rows if the page contains repeated HTML elements.
+    # Remove duplicate events if the page contains repeated HTML elements.
     results = results.drop_duplicates(
         subset=[
             "ACADEMIC_YEAR",
