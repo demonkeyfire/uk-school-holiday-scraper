@@ -29,6 +29,7 @@ from scrapers.authorities.src027_edinburgh                      import scrape_ed
 from scrapers.authorities.src030_falkirk                        import scrape_falkirk
 from scrapers.authorities.src041_kirklees                       import scrape_kirklees
 from scrapers.authorities.src042_knowsley                       import scrape_knowsley
+from scrapers.authorities.src043_lancashire                     import scrape_lancashire
 from scrapers.authorities.src058_northern_ireland               import scrape_northern_ireland
 from scrapers.authorities.src209_wales                          import scrape_wales
 from scrapers.source_config                                     import SourceBlockedError, SourceNoDataError, get_source_url
@@ -57,6 +58,7 @@ SCRAPERS = {"SRC001": scrape_aberdeenshire
            ,"SRC030": scrape_falkirk
            ,"SRC041": scrape_kirklees
            ,"SRC042": scrape_knowsley
+           ,"SRC043": scrape_lancashire
            ,"SRC058": scrape_northern_ireland
            ,"SRC209": scrape_wales}
 
