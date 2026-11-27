@@ -107,9 +107,8 @@ def extract_event_text(text):
     return event_name, date_text
 
 
-
 def validate_date_text(date_text):
-    """Check that the published text contains an English written date."""
+    """Check that the published text contains at least one written date."""
 
     pattern = (
         r"\b(?:"
@@ -118,15 +117,14 @@ def validate_date_text(date_text):
         r",?\s+"
         r")?"
         r"\d{1,2}(?:st|nd|rd|th)?\s+"
-        r"[A-Za-z]+\s+"
-        r"\d{4}\b"
+        r"[A-Za-z]+"
+        r"(?:\s+\d{4})?\b"
     )
 
     if not re.search(pattern, date_text, flags=re.IGNORECASE):
         raise ValueError(
             f"Could not identify a written date in: {date_text}"
         )
-
 
 
 # ------------------------------------------ Main Scraper -------------------------------------------
