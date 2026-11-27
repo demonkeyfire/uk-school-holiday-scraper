@@ -107,18 +107,26 @@ def extract_event_text(text):
     return event_name, date_text
 
 
+
 def validate_date_text(date_text):
-    """Check that the published text contains at least one English date."""
+    """Check that the published text contains an English written date."""
 
     pattern = (
-        r"\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s+"
-        r"\d{1,2}\s+[A-Za-z]+\s+\d{4}\b"
+        r"\b(?:"
+        r"Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|"
+        r"Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?"
+        r",?\s+"
+        r")?"
+        r"\d{1,2}(?:st|nd|rd|th)?\s+"
+        r"[A-Za-z]+\s+"
+        r"\d{4}\b"
     )
 
     if not re.search(pattern, date_text, flags=re.IGNORECASE):
         raise ValueError(
-            f"Could not identify a full English date in: {date_text}"
+            f"Could not identify a written date in: {date_text}"
         )
+
 
 
 # ------------------------------------------ Main Scraper -------------------------------------------
