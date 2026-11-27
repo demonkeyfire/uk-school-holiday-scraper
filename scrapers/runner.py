@@ -21,6 +21,7 @@ from scrapers.authorities.src008_buckinghamshire                import scrape_bu
 from scrapers.authorities.src009_cambridgeshire                 import scrape_cambridgeshire
 from scrapers.authorities.src010_cardiff                        import scrape_cardiff
 from scrapers.authorities.src011_cheshire_west_and_chester      import scrape_cheshire_west_and_chester
+from scrapers.authorities.src012_cornwall                       import scrape_cornwall
 from scrapers.authorities.src017_devon                          import scrape_devon
 from scrapers.authorities.src020_dudley                         import scrape_dudley
 from scrapers.authorities.src021_dundee                         import scrape_dundee
@@ -45,6 +46,7 @@ SCRAPERS = {"SRC001": scrape_aberdeenshire
            ,"SRC009": scrape_cambridgeshire
            ,"SRC010": scrape_cardiff
            ,"SRC011": scrape_cheshire_west_and_chester
+           ,"SRC012": scrape_cornwall
            ,"SRC017": scrape_devon
            ,"SRC020": scrape_dudley
            ,"SRC021": scrape_dundee
